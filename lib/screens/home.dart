@@ -20,8 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Home Screen',
+            FlatButton(
+              child: Text('My Coins'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/coins');
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
             ),
           ],
         ),
