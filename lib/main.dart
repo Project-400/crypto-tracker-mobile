@@ -1,22 +1,33 @@
+import 'package:crypto_tracker/redux/coins/coins.state.dart';
+import 'package:crypto_tracker/store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
 import 'constants/screen-titles.dart';
 import 'navigation.dart';
 
 void main() {
-  runApp(CryptoTrackerApp());
+  runApp(CryptoTrackerApp(store: store));
 }
 
 class CryptoTrackerApp extends StatelessWidget {
+  final Store<CoinsState> store;
+
+  CryptoTrackerApp({ this.store });
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: ScreenTitles.HOME_SCREEN,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return StoreProvider<CoinsState>(
+      store: store,
+      child: MaterialApp(
+        title: ScreenTitles.HOME_SCREEN,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        routes: AppNavigation.routes,
       ),
-      routes: AppNavigation.routes,
     );
   }
 }
