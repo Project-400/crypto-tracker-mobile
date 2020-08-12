@@ -28,6 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
+            FlatButton(
+              child: Text('Crypto Bot'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/bot');
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
+            FlatButton(
+              child: Text('Best Performers'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/best-performers');
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
           ],
         ),
       ),
