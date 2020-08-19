@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto_tracker/models/coin.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class CryptoBotScreen extends StatefulWidget {
   CryptoBotScreen({Key key, this.title}) : super(key: key);
 
   final String title;
+  final WebSocketChannel channel = IOWebSocketChannel.connect('ws://ec2-3-250-75-62.eu-west-1.compute.amazonaws.com:8999');
 
   @override
   _CryptoBotScreenState createState() => _CryptoBotScreenState();
@@ -15,10 +19,19 @@ class CryptoBotScreen extends StatefulWidget {
 
 class _CryptoBotScreenState extends State<CryptoBotScreen> {
 
+  bool isBotWorking = false;
+  String botError = '';
+
   @override
   void initState() {
     super.initState();
-    //fetchCoins();
+    checkBotStatus();
+
+    widget.channel.stream.listen((received) {
+      print(received);
+//      Map<String, dynamic> data = jsonDecode(received);
+      _sortData(received);
+    });
   }
 
   @override
@@ -31,83 +44,69 @@ class _CryptoBotScreenState extends State<CryptoBotScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-//            Text('${widget.coins.length} Coins'),
-//            Expanded(
-//              child: ListView.separated(
-//                padding: EdgeInsets.all(10),
-//                shrinkWrap: true,
-//                scrollDirection: Axis.vertical,
-//                itemCount: widget.coins != null ? widget.coins.length : 0,
-//                itemBuilder: (BuildContext context, int index) {
-//                  final Coin coin = widget.coins[index];
-//
-//                  return InkWell(
-//                    child: Container(
-//                      padding: EdgeInsets.all(10),
-//                      decoration: BoxDecoration(
-//                          boxShadow: [
-//                            BoxShadow(
-//                              color: Colors.grey.withOpacity(0.3),
-//                              spreadRadius: 0.2,
-//                              blurRadius: 0.5,
-//                              offset: Offset(0, 0.5), // changes position of shadow
-//                            ),
-//                          ],
-//                          borderRadius: BorderRadius.only(
-//                              topLeft: Radius.circular(4),
-//                              topRight: Radius.circular(4),
-//                              bottomLeft: Radius.circular(4),
-//                              bottomRight: Radius.circular(4)
-//                          )
-//                      ),
-//                      child: Center(
-//                        child: Row(
-//                          crossAxisAlignment: CrossAxisAlignment.center,
-//                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                          children: <Widget>[
-//                            Container(
-//                              child: Text(
-//                                coin.coin,
-//                                style: TextStyle(
-//                                    fontWeight: FontWeight.bold,
-//                                    fontSize: 16
-//                                ),
-//                              ),
-//                            ),
-//                            Text(
-//                              coin.free.toStringAsFixed(6),
-//                              style: TextStyle(
-//                                  fontSize: 16
-//                              ),
-//                            ),
-//                          ],
-//                        ),
-//                      ),
-//                    ),
-//                  );
-//                },
-//                separatorBuilder: (BuildContext context, int index) => Divider(
-//                  height: 6,
-//                ),
-//              ),
-//            ),
+            Visibility(
+              visible: this.botError.length > 0,
+              child: Text(this.botError),
+            ),
+            Text('The Market Bot is${this.isBotWorking ? '' : ' not'} working right now.'),
+            FlatButton(
+              child: Text(this.isBotWorking ? 'Stop Bot' : 'Start Bot'),
+              onPressed: () {
+                if (this.isBotWorking) this.stopBot();
+                else this.startBot();
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<http.Response> fetchCoins() async {
-    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/bot/best-performers');
+  void _sortData(String msg) {
+    print(msg);
+  }
+
+  Future<http.Response> checkBotStatus() async {
+    final response = await http.get('http://ec2-3-250-75-62.eu-west-1.compute.amazonaws.com:3000/v1/bot-status');
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final coins = (data['coins'] as List).map((c) => Coin.fromJson(c));
-//      setState(() {
-//        widget.coins.addAll(coins);
-//      });
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      setState(() => this.isBotWorking = data['botWorking']);
     } else {
-      throw Exception('Failed to fetch Coins');
+      throw Exception('Failed to fetch Bot status');
+    }
+  }
+
+  Future<http.Response> startBot() async {
+    final response = await http.get('http://ec2-3-250-75-62.eu-west-1.compute.amazonaws.com:3000/v1/start-bot');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      setState(() {
+        if (!data.containsKey('message')) this.botError = 'Failed to start bot';
+        else this.isBotWorking = true;
+      });
+    } else {
+      throw Exception('Failed to start Bot');
+    }
+  }
+
+  Future<http.Response> stopBot() async {
+    final response = await http.get('http://ec2-3-250-75-62.eu-west-1.compute.amazonaws.com:3000/v1/stop-bot');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      setState(() {
+        if (!data.containsKey('message')) this.botError = 'Failed to stop bot';
+        else this.isBotWorking = false;
+      });
+    } else {
+      throw Exception('Failed to stop Bot');
     }
   }
 }

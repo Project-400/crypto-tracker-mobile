@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto_tracker/models/price-change-stats.dart';
@@ -16,10 +17,13 @@ class BestPerformersScreen extends StatefulWidget {
 
 class _BestPerformersScreenState extends State<BestPerformersScreen> {
 
+  Timer ticker;
+  bool isUpdating = false;
+
   @override
   void initState() {
     super.initState();
-    fetchBestPerformers();
+    setIntervalRequest();
   }
 
   @override
@@ -32,6 +36,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(isUpdating ? 'Updating...' : ''),
             Text('Count: ' + this.widget.stats.length.toString()),
             Expanded(
               child: ListView.separated(
@@ -98,8 +103,25 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    ticker.cancel();
+    super.dispose();
+  }
+
+  void setIntervalRequest() {
+    fetchBestPerformers();
+    ticker = Timer.periodic(new Duration(seconds: 20), (timer) {
+      fetchBestPerformers();
+    });
+  }
+
   Future<http.Response> fetchBestPerformers() async {
-    final response = await http.get('http://localhost:3000/trends/best-performers');
+    setState(() {
+      isUpdating = true;
+    });
+
+    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/trends/best-performers');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -112,5 +134,9 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
     } else {
       throw Exception('Failed to fetch Coins');
     }
+
+    setState(() {
+      isUpdating = false;
+    });
   }
 }
