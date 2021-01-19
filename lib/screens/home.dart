@@ -44,6 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
+            FlatButton(
+              child: Text('Subscribe'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/subscribe');
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
           ],
         ),
       ),

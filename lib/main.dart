@@ -7,8 +7,6 @@ import 'package:redux/redux.dart';
 import 'constants/screen-titles.dart';
 import 'navigation.dart';
 
-import 'package:flutter_cognito_plugin/flutter_cognito_plugin.dart';
-
 void main() {
   runApp(CryptoTrackerApp(store: store));
 }

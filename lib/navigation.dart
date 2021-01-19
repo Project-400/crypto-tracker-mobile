@@ -2,6 +2,7 @@ import 'package:crypto_tracker/screens/coins.dart';
 import 'package:crypto_tracker/screens/crypto-bot.dart';
 import 'package:crypto_tracker/screens/home.dart';
 import 'package:crypto_tracker/screens/best-performers.dart';
+import 'package:crypto_tracker/screens/subscribe.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'constants/screen-titles.dart';
@@ -12,7 +13,8 @@ class AppNavigation {
     '/': (BuildContext context) => HomeScreen(title: ScreenTitles.HOME_SCREEN),
     '/coins': (BuildContext context) => CoinsScreen(title: ScreenTitles.COINS_SCREEN),
     '/bot': (BuildContext context) => CryptoBotScreen(title: ScreenTitles.BOT_SCREEN),
-    '/best-performers': (BuildContext context) => BestPerformersScreen(title: ScreenTitles.BEST_PERFORMERS)
+    '/best-performers': (BuildContext context) => BestPerformersScreen(title: ScreenTitles.BEST_PERFORMERS),
+    '/subscribe': (BuildContext context) => SubscribeScreen(title: ScreenTitles.SUBSCRIBE)
   };
 
 }
