@@ -58,7 +58,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
-            botDetails(context),
+            Visibility (
+              child: botDetails(context),
+              visible: isBotWorking,
+            ),
           ],
         ),
       ),
@@ -68,32 +71,83 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   Widget botDetails(BuildContext context) {
     return Column(
       children: <Widget>[
-        Visibility(
-          child: (
-            Center(
-              child: Text(
-                bot != null && bot['tradingPairSymbol'] != null ? bot['tradingPairSymbol'] : '',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-              ),
-            )
+        Center(
+          child: Text(
+            isBotWorking ? bot['tradingPairSymbol'] : '',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
-          visible: showBotDetails,
         ),
-        Visibility(
-          child: (
-            Center(
-              child: Text(bot != null && bot['botState'] != null ? 'The bot is currently ${bot['botState']}' : ''),
-            )
-          ),
-          visible: showBotDetails,
+        Row(
+          children: [
+            Expanded(
+                child:
+                Container(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          isBotWorking ? '${bot['quote']}' : '',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                            isBotWorking ? '24.54404' : '',
+                            style: TextStyle(
+                                fontSize: 16
+                            )
+                        ),
+                      ],
+                    ),
+                  ),
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(left: 10, right: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: Colors.grey,
+                  ),
+                ),
+            ),
+            Icon(
+                Icons.keyboard_arrow_right
+            ),
+            Expanded(
+                child: Container(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          isBotWorking ? '${bot['base']}' : '',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                          isBotWorking ? '24.54404' : '',
+                          style: TextStyle(
+                              fontSize: 16
+                          )
+                        ),
+                      ],
+                    ),
+                  ),
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.only(left: 5, right: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: Colors.grey,
+                  ),
+                )
+            ),
+          ],
         ),
-        Visibility(
-          child: (
-            Center(
-              child: Text(bot != null ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : ''),
-            )
-          ),
-          visible: showBotDetails,
+        Center(
+          child: Text(isBotWorking ? 'The bot is currently ${bot['botState']}' : ''),
+        ),
+        Center(
+          child: Text(isBotWorking ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : ''),
         ),
         Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
       ]
