@@ -19,7 +19,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
   Timer ticker;
   bool isUpdating = false;
-  String fullResponse = '';
+  bool isBotWorking = false;
+  bool showBotDetails = false;
+  Map<String, dynamic> fullResponse;
+  Map<String, dynamic> bot;
 
   @override
   void initState() {
@@ -35,12 +38,11 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
+//          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(isUpdating ? 'Updating...' : ''),
-            Text(fullResponse != null ? fullResponse : 'Waiting..'),
-            FlatButton(
+            if (!isBotWorking) FlatButton(
               child: Text('Start Bot'),
               onPressed: () {
                 subscribeToBot();
@@ -48,14 +50,46 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
-            FlatButton(
+            if (isBotWorking) FlatButton(
               child: Text('Shutdown Bot'),
               onPressed: () {
                 unsubscribeToBot();
               },
               color: Colors.lightBlue,
               textColor: Colors.white,
-            )
+            ),
+            Visibility(
+              child: (
+                Center(
+                  child: Text(
+                    bot != null && bot['tradingPairSymbol'] != null ? bot['tradingPairSymbol'] : '',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                  ),
+                )
+              ),
+              visible: showBotDetails,
+            ),
+            Visibility(
+              child: (
+                Center(
+                  child: Text(
+                    bot != null && bot['botState'] != null ? 'The bot is currently ${bot['botState']}' : '',
+                  ),
+                )
+              ),
+              visible: showBotDetails,
+            ),
+            Visibility(
+              child: (
+                Center(
+                  child: Text(
+                    bot != null ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : '',
+                  ),
+                )
+              ),
+              visible: showBotDetails,
+            ),
+            Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
           ],
         ),
       ),
@@ -93,7 +127,12 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       setState(() {
 //        widget.stats.clear();
 //        widget.stats.addAll(stats);
-      fullResponse = response.body;
+        fullResponse = json.decode(response.body);
+        bot = fullResponse['bot'];
+        showBotDetails = true;
+        isBotWorking = true;
+
+        print(bot);
       });
     } else {
       throw Exception('Failed to subscribe to Bot');
@@ -119,7 +158,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       print('*********');
 
       setState(() {
-        fullResponse = '';
+        fullResponse = null;
+        bot = null;
+        showBotDetails = false;
+        isBotWorking = false;
       });
     } else {
       throw Exception('Failed to unsubscribe from Bot');
