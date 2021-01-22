@@ -4,6 +4,7 @@ import 'dart:convert';
 //import 'package:crypto_tracker/models/price-change-stats.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:dropdown_search/dropdown_search.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
@@ -41,7 +42,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         child: ListView(
 //          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(isUpdating ? 'Updating...' : ''),
+            Visibility (
+              child: currencyPairSelector(context),
+              visible: !isBotWorking,
+            ),
             if (!isBotWorking) FlatButton(
               child: Text('Start Bot'),
               onPressed: () {
@@ -68,15 +72,27 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
+  Widget currencyPairSelector(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          child: DropdownSearch<String>(
+            mode: Mode.BOTTOM_SHEET,
+            showSelectedItem: true,
+            items: ['GTO - BTC', 'CRV - BTC', 'LTO - BTC', 'ALPHA - BTC', 'SUSHI - BTC', 'MANA - BTC', 'XLM - BTC', 'XRP - BTC'],
+            label: 'Currency Pair',
+            hint: 'The crypto currency you want to trade',
+            onChanged: print,
+          ),
+          padding: EdgeInsets.all(10),
+        )
+      ],
+    );
+  }
+
   Widget botDetails(BuildContext context) {
     return Column(
       children: <Widget>[
-        Center(
-          child: Text(
-            isBotWorking ? bot['tradingPairSymbol'] : '',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          ),
-        ),
         Row(
           children: [
             Expanded(
@@ -110,7 +126,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ),
             ),
             Icon(
-                Icons.keyboard_arrow_right
+                Icons.keyboard_arrow_right,
+                size: 40,
             ),
             Expanded(
                 child: Container(
