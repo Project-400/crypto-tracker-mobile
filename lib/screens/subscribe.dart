@@ -58,41 +58,45 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
-            Visibility(
-              child: (
-                Center(
-                  child: Text(
-                    bot != null && bot['tradingPairSymbol'] != null ? bot['tradingPairSymbol'] : '',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                  ),
-                )
-              ),
-              visible: showBotDetails,
-            ),
-            Visibility(
-              child: (
-                Center(
-                  child: Text(
-                    bot != null && bot['botState'] != null ? 'The bot is currently ${bot['botState']}' : '',
-                  ),
-                )
-              ),
-              visible: showBotDetails,
-            ),
-            Visibility(
-              child: (
-                Center(
-                  child: Text(
-                    bot != null ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : '',
-                  ),
-                )
-              ),
-              visible: showBotDetails,
-            ),
-            Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+            botDetails(context),
           ],
         ),
       ),
+    );
+  }
+
+  Widget botDetails(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Visibility(
+          child: (
+            Center(
+              child: Text(
+                bot != null && bot['tradingPairSymbol'] != null ? bot['tradingPairSymbol'] : '',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+              ),
+            )
+          ),
+          visible: showBotDetails,
+        ),
+        Visibility(
+          child: (
+            Center(
+              child: Text(bot != null && bot['botState'] != null ? 'The bot is currently ${bot['botState']}' : ''),
+            )
+          ),
+          visible: showBotDetails,
+        ),
+        Visibility(
+          child: (
+            Center(
+              child: Text(bot != null ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : ''),
+            )
+          ),
+          visible: showBotDetails,
+        ),
+        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+      ]
     );
   }
 
