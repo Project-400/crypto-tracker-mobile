@@ -23,6 +23,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   bool isBotWorking = false;
   bool showBotDetails = false;
   String selectedCurrencyPair;
+  double quoteAmount;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
 
@@ -47,12 +48,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: currencyPairSelector(context),
               visible: !isBotWorking,
             ),
-            if (!isBotWorking && selectedCurrencyPair != null) FlatButton(
+            if (!isBotWorking) FlatButton(
               child: Text('Start Bot'),
-              onPressed: () {
-                subscribeToBot();
-              },
-              color: Colors.lightBlue,
+              onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
+              color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
               textColor: Colors.white,
             ),
             if (isBotWorking) FlatButton(
@@ -86,7 +85,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
             onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
           ),
           padding: EdgeInsets.all(10),
-        )
+        ),
+        Container (
+          child: TextField(
+            decoration: InputDecoration(
+            labelText: 'Quote Quantity',
+              hintText: '0.0001'
+            ),
+            onChanged: (amount) => quoteAmount = double.parse(amount),
+          ),
+          padding: EdgeInsets.all(10),
+        ),
       ],
     );
   }
@@ -97,67 +106,67 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         Row(
           children: [
             Expanded(
-                child:
-                Container(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          isBotWorking ? '${bot['quote']}' : '',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                          ),
+              child:
+              Container(
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        isBotWorking ? '${bot['quote']}' : '',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
                         ),
-                        Text(
-                            isBotWorking ? '24.54404' : '',
-                            style: TextStyle(
-                                fontSize: 16
-                            )
-                        ),
-                      ],
-                    ),
-                  ),
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(left: 10, right: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: Colors.grey,
+                      ),
+                      Text(
+                        isBotWorking ? bot['quoteQty'].toString() : '',
+                        style: TextStyle(
+                            fontSize: 16
+                        )
+                      ),
+                    ],
                   ),
                 ),
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.only(left: 10, right: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.grey,
+                ),
+              ),
             ),
             Icon(
                 Icons.keyboard_arrow_right,
                 size: 40,
             ),
             Expanded(
-                child: Container(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          isBotWorking ? '${bot['base']}' : '',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                          ),
+              child: Container(
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        isBotWorking ? '${bot['base']}' : '',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
                         ),
-                        Text(
-                          isBotWorking ? '24.54404' : '',
-                          style: TextStyle(
-                              fontSize: 16
-                          )
-                        ),
-                      ],
-                    ),
+                      ),
+                      Text(
+                        isBotWorking ? '24.54404' : '',
+                        style: TextStyle(
+                            fontSize: 16
+                        )
+                      ),
+                    ],
                   ),
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.only(left: 5, right: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: Colors.grey,
-                  ),
-                )
+                ),
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.only(left: 5, right: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.grey,
+                ),
+              )
             ),
           ],
         ),
@@ -197,8 +206,11 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     });
 
     if (selectedCurrencyPair == null) throw Exception('No currency selected');
+    if (quoteAmount == null) throw Exception('Quote amount is missing selected');
 
-    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair');
+    print('Sending request to bot to trade $selectedCurrencyPair with $quoteAmount quote amount');
+
+    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -216,6 +228,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         showBotDetails = true;
         isBotWorking = true;
         selectedCurrencyPair = null;
+        quoteAmount = null;
 
         print(bot);
       });
@@ -247,7 +260,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         bot = null;
         showBotDetails = false;
         isBotWorking = false;
-        selectedCurrencyPair = null;
+        quoteAmount = null;
       });
     } else {
       throw Exception('Failed to unsubscribe from Bot');
