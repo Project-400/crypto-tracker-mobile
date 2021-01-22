@@ -22,6 +22,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   bool isUpdating = false;
   bool isBotWorking = false;
   bool showBotDetails = false;
+  String selectedCurrencyPair;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
 
@@ -46,7 +47,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: currencyPairSelector(context),
               visible: !isBotWorking,
             ),
-            if (!isBotWorking) FlatButton(
+            if (!isBotWorking && selectedCurrencyPair != null) FlatButton(
               child: Text('Start Bot'),
               onPressed: () {
                 subscribeToBot();
@@ -79,10 +80,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           child: DropdownSearch<String>(
             mode: Mode.BOTTOM_SHEET,
             showSelectedItem: true,
-            items: ['GTO - BTC', 'CRV - BTC', 'LTO - BTC', 'ALPHA - BTC', 'SUSHI - BTC', 'MANA - BTC', 'XLM - BTC', 'XRP - BTC'],
+            items: ['GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
             label: 'Currency Pair',
             hint: 'The crypto currency you want to trade',
-            onChanged: print,
+            onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
           ),
           padding: EdgeInsets.all(10),
         )
@@ -171,6 +172,12 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
+  void setSelectedCurrencyPair(String pair) {
+    setState(() {
+      selectedCurrencyPair = pair;
+    });
+  }
+
   @override
   void dispose() {
     if (ticker != null) ticker.cancel();
@@ -189,7 +196,9 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:3000/v1/subscribe');
+    if (selectedCurrencyPair == null) throw Exception('No currency selected');
+
+    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -206,6 +215,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         bot = fullResponse['bot'];
         showBotDetails = true;
         isBotWorking = true;
+        selectedCurrencyPair = null;
 
         print(bot);
       });
@@ -237,6 +247,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         bot = null;
         showBotDetails = false;
         isBotWorking = false;
+        selectedCurrencyPair = null;
       });
     } else {
       throw Exception('Failed to unsubscribe from Bot');
