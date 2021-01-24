@@ -1,17 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
-//import 'package:crypto_tracker/models/price-change-stats.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
 
   final String title;
-//  final List<PriceChangeStats> stats = [];
-
   @override
   _SubscribeScreenState createState() => _SubscribeScreenState();
 }
@@ -24,14 +22,14 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   bool showBotDetails = false;
   String selectedCurrencyPair;
   double quoteAmount;
+  bool isProfiting = false;
+  double priceDifferenceInUSD = 1.89;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
 
   @override
   void initState() {
     super.initState();
-//    setIntervalRequest();
-//    subscribeToBot();
   }
 
   @override
@@ -62,6 +60,13 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               color: Colors.lightBlue,
               textColor: Colors.white,
             ),
+//            Visibility(
+//              child: SpinKitWave(
+//                color: Colors.black,
+//                size: 50.0,
+//              ),
+//              visible: isUpdating,
+//            ),
             Visibility (
               child: botDetails(context),
               visible: isBotWorking,
@@ -127,7 +132,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     ],
                   ),
                 ),
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 margin: EdgeInsets.only(left: 10, right: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
@@ -152,7 +157,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                         ),
                       ),
                       Text(
-                        isBotWorking ? '24.54404' : '',
+                        isBotWorking ? '2.43245325' : '',
                         style: TextStyle(
                             fontSize: 16
                         )
@@ -160,7 +165,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     ],
                   ),
                 ),
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 margin: EdgeInsets.only(left: 5, right: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
@@ -176,8 +181,52 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         Center(
           child: Text(isBotWorking ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : ''),
         ),
+        Row(
+          children: [
+            profitLossBlock(context)
+          ],
+        ),
         Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
       ]
+    );
+  }
+
+  Widget profitLossBlock(BuildContext context) {
+    return Expanded(
+      child: Container(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  isProfiting ? Icons.arrow_upward : Icons.arrow_downward,
+                  size: 30,
+                ),
+                Text(
+                  '0.0345',
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold
+                  ),
+                )
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Row(
+              children: [
+                Text('~ \$$priceDifferenceInUSD')
+              ],
+              mainAxisAlignment: MainAxisAlignment.center,
+            )
+          ],
+        ),
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.grey,
+        ),
+      ),
     );
   }
 
@@ -194,9 +243,9 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   }
 
   void setIntervalRequest() {
-    subscribeToBot();
+//    getUpdatedBotDetails();
     ticker = Timer.periodic(new Duration(seconds: 5), (timer) {
-      subscribeToBot();
+      getUpdatedBotDetails();
     });
   }
 
@@ -229,8 +278,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         isBotWorking = true;
         selectedCurrencyPair = null;
         quoteAmount = null;
-
-        print(bot);
       });
     } else {
       throw Exception('Failed to subscribe to Bot');
@@ -239,12 +286,16 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     setState(() {
       isUpdating = false;
     });
+
+    setIntervalRequest();
   }
 
   Future<http.Response> unsubscribeToBot() async {
     setState(() {
       isUpdating = true;
     });
+
+    print('Sending request to shutdown bot ${bot['botId']}.');
 
     final response = await http.get('http://localhost:3000/v1/unsubscribe');
 
@@ -255,6 +306,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       print(data);
       print('*********');
 
+      if (ticker != null) ticker.cancel();
+
       setState(() {
         fullResponse = null;
         bot = null;
@@ -264,6 +317,35 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       });
     } else {
       throw Exception('Failed to unsubscribe from Bot');
+    }
+
+    setState(() {
+      isUpdating = false;
+    });
+  }
+
+  Future<http.Response> getUpdatedBotDetails() async {
+    setState(() {
+      isUpdating = true;
+    });
+
+    print('Sending request to bot ${bot['botId']} for latest updates.');
+
+    final response = await http.get('http://localhost:3000/v1/trader-bot?botId=${bot['botId']}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      print('*********');
+      print(data);
+      print('*********');
+
+      setState(() {
+        fullResponse = json.decode(response.body);
+        bot = fullResponse['bot'];
+      });
+    } else {
+      throw Exception('Failed to retrieve latest Bot updates');
     }
 
     setState(() {
