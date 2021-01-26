@@ -71,6 +71,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: botDetails(context),
               visible: isBotWorking,
             ),
+            botLogs(context)
           ],
         ),
       ),
@@ -186,7 +187,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
             profitLossBlock(context)
           ],
         ),
-        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+//        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
       ]
     );
   }
@@ -241,6 +242,33 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           color: Colors.grey,
         ),
       ),
+    );
+  }
+
+  Widget botLogs(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Center(
+            child: Text(
+                'Logs',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20
+                ),
+            ),
+          ),
+          ListView(
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            children: [
+              Text('TEST1'),
+              Text('TEST2'),
+              Text('TEST3')
+            ],
+          ),
+        ],
+      )
     );
   }
 
