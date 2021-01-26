@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
 
   final String title;
+  final WebSocketChannel channel = IOWebSocketChannel.connect('ws://localhost:8999');
+
   @override
   _SubscribeScreenState createState() => _SubscribeScreenState();
 }
@@ -26,10 +30,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   double priceDifferenceInUSD = 1.89;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
+  List<String> botLogEvents = [];
 
   @override
   void initState() {
     super.initState();
+
+    widget.channel.stream.listen((received) {
+      _receiveBotUpdate(received);
+    });
   }
 
   @override
@@ -71,7 +80,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: botDetails(context),
               visible: isBotWorking,
             ),
-            botLogs(context)
+            Visibility (
+              child: botLogs(context),
+              visible: isBotWorking,
+            ),
           ],
         ),
       ),
@@ -223,10 +235,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: Row(
                 children: [
                   Text(
-                      'Spent: ${bot['quoteQty']}'
+                      'Spent: ${isBotWorking ? bot['quoteQty'] : '0'}'
                   ),
                   Text(
-                      'Current Value: ${bot['quoteQty'] + 0.1}'
+                      'Current Value: ${isBotWorking ? bot['quoteQty'] + 0.1 : 0}'
                   )
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,8 +258,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   }
 
   Widget botLogs(BuildContext context) {
-    return Expanded(
-      child: Column(
+    return Column(
         children: [
           Center(
             child: Text(
@@ -258,18 +269,72 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ),
             ),
           ),
-          ListView(
-            shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            children: [
-              Text('TEST1'),
-              Text('TEST2'),
-              Text('TEST3')
-            ],
-          ),
+//          ListView(
+//            shrinkWrap: true,
+//            physics: ClampingScrollPhysics(),
+//            children: [
+//              Text('TEST1'),
+//              Text('TEST2'),
+//              Text('TEST3')
+//            ],
+//          ),
+          ListView.separated(
+              padding: EdgeInsets.all(10),
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              itemCount: botLogEvents.length,
+              itemBuilder: (BuildContext context, int index) {
+                final String event = botLogEvents[index];
+
+                return InkWell(
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 0.2,
+                            blurRadius: 0.5,
+                            offset: Offset(0, 0.5), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                            bottomLeft: Radius.circular(4),
+                            bottomRight: Radius.circular(4)
+                        )
+                    ),
+                    child: Center(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                              child: Flexible(
+                                child: Text(
+                                  event,
+                                  style: TextStyle(
+//                                    fontWeight: FontWeight.bold,
+                                      fontSize: 14
+                                  ),
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) => Divider(
+                height: 6,
+              ),
+            ),
+
         ],
-      )
-    );
+      );
   }
 
   void setSelectedCurrencyPair(String pair) {
@@ -329,7 +394,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       isUpdating = false;
     });
 
-    setIntervalRequest();
+//    setIntervalRequest();
   }
 
   Future<http.Response> unsubscribeToBot() async {
@@ -392,6 +457,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
     setState(() {
       isUpdating = false;
+    });
+  }
+
+  void _receiveBotUpdate(String message) {
+    print(message);
+
+    setState(() {
+      botLogEvents.insert(0, message);
+      if (botLogEvents.length > 50) botLogEvents.removeLast();
     });
   }
 
