@@ -217,6 +217,20 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 Text('~ \$$priceDifferenceInUSD')
               ],
               mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Container(
+              child: Row(
+                children: [
+                  Text(
+                      'Spent: ${bot['quoteQty']}'
+                  ),
+                  Text(
+                      'Current Value: ${bot['quoteQty'] + 0.1}'
+                  )
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+              padding: EdgeInsets.only(top: 20),
             )
           ],
         ),
