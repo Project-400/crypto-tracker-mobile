@@ -30,6 +30,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   double priceDifferenceInUSD = 1.89;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
+  Map<String, dynamic> priceInfo;
+  String currentPrice;
   List<String> botLogEvents = [];
 
   @override
@@ -192,14 +194,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           child: Text(isBotWorking ? 'The bot is currently ${bot['botState']}' : ''),
         ),
         Center(
-          child: Text(isBotWorking ? '1 ${bot['base']} = ${bot['currentPrice']} ${bot['quote']}' : ''),
+          child: Text(isBotWorking ? '1 ${bot['base']} = $currentPrice ${bot['quote']}' : ''),
         ),
+//        Center(
+//          child: Text(isBotWorking ? '$currentPrice' : ''),
+//        ),
         Row(
           children: [
             profitLossBlock(context)
           ],
         ),
-//        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
       ]
     );
   }
@@ -346,6 +351,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   @override
   void dispose() {
     if (ticker != null) ticker.cancel();
+    widget.channel.sink.close();
     super.dispose();
   }
 
@@ -381,6 +387,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 //        widget.stats.addAll(stats);
         fullResponse = json.decode(response.body);
         bot = fullResponse['bot'];
+        priceInfo = fullResponse['priceInfo'];
+        currentPrice = priceInfo['price'];
         showBotDetails = true;
         isBotWorking = true;
         selectedCurrencyPair = null;
@@ -466,6 +474,14 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     setState(() {
       botLogEvents.insert(0, message);
       if (botLogEvents.length > 50) botLogEvents.removeLast();
+
+      try {
+        final data = json.decode(message);
+        print(data);
+        if (data['price'] != null) currentPrice = data['price'].toString();
+      } catch (e) {
+        print('Websocket message is not in JSON format');
+      }
     });
   }
 
