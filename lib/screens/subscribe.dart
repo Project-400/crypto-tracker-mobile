@@ -25,6 +25,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   bool isBotWorking = false;
   bool showBotDetails = false;
   String selectedCurrencyPair;
+  String clientSocketId;
   double quoteAmount;
   bool isProfiting = false;
   double priceDifferenceInUSD = 1.89;
@@ -372,7 +373,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
     print('Sending request to bot to trade $selectedCurrencyPair with $quoteAmount quote amount');
 
-    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount');
+    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&clientSocketId=$clientSocketId');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -389,6 +390,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         bot = fullResponse['bot'];
         priceInfo = fullResponse['priceInfo'];
         currentPrice = priceInfo['price'];
+//        clientSocketId = fullResponse['clientSocketId'];
         showBotDetails = true;
         isBotWorking = true;
         selectedCurrencyPair = null;
@@ -478,7 +480,13 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       try {
         final data = json.decode(message);
         print(data);
-        if (data['price'] != null) currentPrice = data['price'].toString();
+        if (data['clientSocketId'] != null) {
+          clientSocketId = data['clientSocketId'].toString();
+          print('clientSocketId: $clientSocketId');
+        }
+        if (data['price'] != null) {
+          currentPrice = data['price'].toString();
+        }
       } catch (e) {
         print('Websocket message is not in JSON format');
       }
