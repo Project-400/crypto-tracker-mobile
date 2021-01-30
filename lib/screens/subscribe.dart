@@ -32,6 +32,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
   Map<String, dynamic> priceInfo;
+  Map<String, dynamic> tradeData;
   String currentPrice;
   List<String> botLogEvents = [];
 
@@ -173,7 +174,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                         ),
                       ),
                       Text(
-                        isBotWorking ? '2.43245325' : '',
+                        isBotWorking && tradeData != null ? tradeData['baseQty'].toString() : '',
                         style: TextStyle(
                             fontSize: 16
                         )
@@ -381,20 +382,16 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       print('*********');
       print(data);
       print('*********');
-//      final stats = (data['stats'] as List).map((s) => PriceChangeStats.fromJson(s));
 
       setState(() {
-//        widget.stats.clear();
-//        widget.stats.addAll(stats);
         fullResponse = json.decode(response.body);
         bot = fullResponse['bot'];
         priceInfo = fullResponse['priceInfo'];
         currentPrice = priceInfo['price'];
-//        clientSocketId = fullResponse['clientSocketId'];
         showBotDetails = true;
         isBotWorking = true;
         selectedCurrencyPair = null;
-        quoteAmount = null;
+//        quoteAmount = null;
       });
     } else {
       throw Exception('Failed to subscribe to Bot');
@@ -486,6 +483,9 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         }
         if (data['price'] != null) {
           currentPrice = data['price'].toString();
+        }
+        if (data['tradeData'] != null) {
+          tradeData = data['tradeData'];
         }
       } catch (e) {
         print('Websocket message is not in JSON format');
