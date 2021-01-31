@@ -101,7 +101,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           child: DropdownSearch<String>(
             mode: Mode.BOTTOM_SHEET,
             showSelectedItem: true,
-            items: ['GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+            items: ['CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
             label: 'Currency Pair',
             hint: 'The crypto currency you want to trade',
             onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
@@ -206,7 +206,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
             profitLossBlock(context)
           ],
         ),
-        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+//        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
       ]
     );
   }
@@ -223,7 +223,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                   size: 30,
                 ),
                 Text(
-                  '0.0345',
+                  tradeData != null ? '${tradeData['priceDifference']} (${tradeData['percentageDifference'].toStringAsFixed(2)}%)' : '',
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold
@@ -471,12 +471,13 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     print(message);
 
     setState(() {
-      botLogEvents.insert(0, message);
-      if (botLogEvents.length > 50) botLogEvents.removeLast();
-
       try {
         final data = json.decode(message);
-        print(data);
+        print(data['clientSocketId']);
+        if (data['botLog'] != null) {
+          botLogEvents.insert(0, data['botLog']);
+          if (botLogEvents.length > 50) botLogEvents.removeLast();
+        }
         if (data['clientSocketId'] != null) {
           clientSocketId = data['clientSocketId'].toString();
           print('clientSocketId: $clientSocketId');
@@ -486,6 +487,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         }
         if (data['tradeData'] != null) {
           tradeData = data['tradeData'];
+
+          isProfiting = tradeData['priceDifference'] < 0;
         }
       } catch (e) {
         print('Websocket message is not in JSON format');
