@@ -59,27 +59,31 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: ListView(
+//        child: Column(
+//          children: [
+//            Visibility(
+//              visible: botState != BotState.FINISHED,
+              child: ListView(
 //          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Visibility (
-              child: currencyPairSelector(context),
-              visible: !isBotWorking,
-            ),
-            if (!isBotWorking) FlatButton(
-              child: Text('Start Bot'),
-              onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
-              color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
-              textColor: Colors.white,
-            ),
-            if (isBotWorking) FlatButton(
-              child: Text('Shutdown Bot'),
-              onPressed: () {
-                unsubscribeToBot();
-              },
-              color: Colors.lightBlue,
-              textColor: Colors.white,
-            ),
+                children: <Widget>[
+                  Visibility (
+                    child: currencyPairSelector(context),
+                    visible: !isBotWorking,
+                  ),
+                  if (!isBotWorking) FlatButton(
+                    child: Text('Start Bot'),
+                    onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
+                    color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
+                    textColor: Colors.white,
+                  ),
+                  if (isBotWorking) FlatButton(
+                    child: Text('Shutdown Bot'),
+                    onPressed: () {
+                      unsubscribeToBot();
+                    },
+                    color: Colors.lightBlue,
+                    textColor: Colors.white,
+                  ),
 //            Visibility(
 //              child: SpinKitWave(
 //                color: Colors.black,
@@ -87,16 +91,23 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 //              ),
 //              visible: isUpdating,
 //            ),
-            Visibility (
-              child: botDetails(context),
-              visible: isBotWorking,
-            ),
-            Visibility (
-              child: botLogs(context),
-              visible: isBotWorking,
-            ),
-          ],
-        ),
+                  Visibility (
+                    child: botDetails(context),
+                    visible: isBotWorking,
+                  ),
+                  Visibility (
+                    child: botLogs(context),
+                    visible: isBotWorking,
+                  ),
+                ],
+              ),
+//            ),
+//            Visibility (
+//              child: botFinishedDetails(context),
+//              visible: botState == BotState.FINISHED,
+//            ),
+//          ],
+//        )
       ),
     );
   }
@@ -284,73 +295,81 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
   Widget botLogs(BuildContext context) {
     return Column(
-        children: [
-          Center(
-            child: Text(
-                'Logs',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20
-                ),
-            ),
+      children: [
+        Center(
+          child: Text(
+              'Logs',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20
+              ),
           ),
-          ListView.separated(
-              padding: EdgeInsets.all(10),
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              itemCount: botLogEvents.length,
-              itemBuilder: (BuildContext context, int index) {
-                final BotLog log = botLogEvents[index];
+        ),
+        ListView.separated(
+            padding: EdgeInsets.all(10),
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            itemCount: botLogEvents.length,
+            itemBuilder: (BuildContext context, int index) {
+              final BotLog log = botLogEvents[index];
 
-                return InkWell(
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 0.2,
-                            blurRadius: 0.5,
-                            offset: Offset(0, 0.5), // changes position of shadow
-                          ),
-                        ],
-                        borderRadius: BorderRadius.all(Radius.circular(4))
-                    ),
-                    child:
-                      Container(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                fit: FlexFit.loose,
-                                child: Text(
-                                  log.log
+              return InkWell(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 0.2,
+                          blurRadius: 0.5,
+                          offset: Offset(0, 0.5), // changes position of shadow
+                        ),
+                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(4))
+                  ),
+                  child:
+                    Container(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: Text(
+                                log.log
+                              ),
+                            ),
+                            Align(
+                              child: Text(
+                                '${log.time.hour}:${log.time.minute}:${log.time.second}',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12
                                 ),
                               ),
-                              Align(
-                                child: Text(
-                                  '${log.time.hour}:${log.time.minute}:${log.time.second}',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12
-                                  ),
-                                ),
-                                alignment: FractionalOffset.bottomCenter,
-                              )
-                            ],
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          )
-                      ),
-                  ),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) => Divider(
-                height: 6,
-              ),
+                              alignment: FractionalOffset.bottomCenter,
+                            )
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        )
+                    ),
+                ),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) => Divider(
+              height: 6,
             ),
+          ),
 
-        ],
-      );
+      ],
+    );
+  }
+
+  Widget botFinishedDetails(BuildContext context) {
+    return Column(
+      children: [
+        Text('FINISHED --- ')
+      ],
+    );
   }
 
   void setSelectedCurrencyPair(String pair) {
@@ -492,6 +511,12 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         }
         if (data['botState'] != null) {
           if (data['botId'] == bot['botId']) botState = EnumToString.fromString(BotState.values, data['botState']);
+
+          if (botState == BotState.FINISHED) {
+            Future.delayed(const Duration(seconds: 5), () {
+              Navigator.pushNamed(context, '/bot-finished');
+            });
+          }
         }
         if (data['clientSocketId'] != null) {
           clientSocketId = data['clientSocketId'].toString();

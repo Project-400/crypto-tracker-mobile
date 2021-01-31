@@ -5,5 +5,6 @@ class ScreenTitles {
   static const String BOT_SCREEN = 'Crypto Bot';
   static const String BEST_PERFORMERS = 'Best Performers';
   static const String SUBSCRIBE = 'Subscribe';
+  static const String BOT_FINISHED = 'Bot Finished';
 
 }
