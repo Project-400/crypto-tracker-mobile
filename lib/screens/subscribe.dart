@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
+import 'dart:math';
 
+import 'package:crypto_tracker/constants/enums.dart';
+import 'package:crypto_tracker/models/bot-log.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:enum_to_string/enum_to_string.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
@@ -35,7 +40,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   Map<String, dynamic> priceInfo;
   Map<String, dynamic> tradeData;
   String currentPrice;
-  List<String> botLogEvents = [];
+  List<BotLog> botLogEvents = [];
+  BotState botState = BotState.NONE;
 
   @override
   void initState() {
@@ -123,12 +129,11 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           title: Text('Repeatedly Trade'),
           value: repeatedlyTrade,
           onChanged: (isTicked) {
-            print(isTicked);
             setState(() {
               repeatedlyTrade = isTicked;
             });
           },
-          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+          controlAffinity: ListTileControlAffinity.leading,
         )
       ],
     );
@@ -205,7 +210,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ],
         ),
         Center(
-          child: Text(isBotWorking ? 'The bot is currently ${bot['botState']}' : ''),
+          child: Text(isBotWorking ? 'The bot is currently $botState' : ''),
         ),
         Center(
           child: Text(isBotWorking ? '1 ${bot['base']} = $currentPrice ${bot['quote']}' : ''),
@@ -219,6 +224,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ],
         ),
 //        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
+        Text(botState.toString().split('.').last),
       ]
     );
   }
@@ -288,15 +294,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ),
             ),
           ),
-//          ListView(
-//            shrinkWrap: true,
-//            physics: ClampingScrollPhysics(),
-//            children: [
-//              Text('TEST1'),
-//              Text('TEST2'),
-//              Text('TEST3')
-//            ],
-//          ),
           ListView.separated(
               padding: EdgeInsets.all(10),
               shrinkWrap: true,
@@ -304,7 +301,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               scrollDirection: Axis.vertical,
               itemCount: botLogEvents.length,
               itemBuilder: (BuildContext context, int index) {
-                final String event = botLogEvents[index];
+                final BotLog log = botLogEvents[index];
 
                 return InkWell(
                   child: Container(
@@ -318,32 +315,32 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                             offset: Offset(0, 0.5), // changes position of shadow
                           ),
                         ],
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(4),
-                            topRight: Radius.circular(4),
-                            bottomLeft: Radius.circular(4),
-                            bottomRight: Radius.circular(4)
-                        )
+                        borderRadius: BorderRadius.all(Radius.circular(4))
                     ),
-                    child: Center(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Container(
-                              child: Flexible(
+                    child:
+                      Container(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                fit: FlexFit.loose,
                                 child: Text(
-                                  event,
+                                  log.log
+                                ),
+                              ),
+                              Align(
+                                child: Text(
+                                  '${log.time.hour}:${log.time.minute}:${log.time.second}',
                                   style: TextStyle(
-//                                    fontWeight: FontWeight.bold,
-                                      fontSize: 14
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12
                                   ),
                                 ),
+                                alignment: FractionalOffset.bottomCenter,
                               )
-                          ),
-                        ],
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          )
                       ),
-                    ),
                   ),
                 );
               },
@@ -404,6 +401,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         isBotWorking = true;
         selectedCurrencyPair = null;
         repeatedlyTrade = true;
+        botState = EnumToString.fromString(BotState.values, bot['botState']);
 //        quoteAmount = null;
       });
     } else {
@@ -486,10 +484,14 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     setState(() {
       try {
         final data = json.decode(message);
-        print(data['clientSocketId']);
+
         if (data['botLog'] != null) {
-          botLogEvents.insert(0, data['botLog']);
+          BotLog log = BotLog.fromJson(json.decode(data['botLog']));
+          botLogEvents.insert(0, log);
           if (botLogEvents.length > 50) botLogEvents.removeLast();
+        }
+        if (data['botState'] != null) {
+          if (data['botId'] == bot['botId']) botState = EnumToString.fromString(BotState.values, data['botState']);
         }
         if (data['clientSocketId'] != null) {
           clientSocketId = data['clientSocketId'].toString();
