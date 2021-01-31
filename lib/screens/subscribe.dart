@@ -27,6 +27,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   String selectedCurrencyPair;
   String clientSocketId;
   double quoteAmount;
+  bool repeatedlyTrade = false;
   bool isProfiting = false;
   double priceDifferenceInUSD = 1.89;
   Map<String, dynamic> fullResponse;
@@ -118,6 +119,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ),
           padding: EdgeInsets.all(10),
         ),
+        CheckboxListTile(
+          title: Text('Repeatedly Trade'),
+          value: repeatedlyTrade,
+          onChanged: (isTicked) {
+            print(isTicked);
+            setState(() {
+              repeatedlyTrade = isTicked;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+        )
       ],
     );
   }
@@ -374,7 +386,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
     print('Sending request to bot to trade $selectedCurrencyPair with $quoteAmount quote amount');
 
-    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&clientSocketId=$clientSocketId');
+    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -391,6 +403,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         showBotDetails = true;
         isBotWorking = true;
         selectedCurrencyPair = null;
+        repeatedlyTrade = true;
 //        quoteAmount = null;
       });
     } else {
@@ -411,7 +424,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
     print('Sending request to shutdown bot ${bot['botId']}.');
 
-    final response = await http.get('http://localhost:3000/v1/unsubscribe');
+    final response = await http.get('http://localhost:3000/v1/unsubscribe?botId=${bot['botId']}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
