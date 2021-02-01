@@ -5,10 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:crypto_tracker/models/coin.dart';
 
 class BotFinishedScreen extends StatefulWidget {
-  BotFinishedScreen({Key key, this.title}) : super(key: key);
+  BotFinishedScreen({Key key, this.title, this.botId, }) : super(key: key);
 
   final String title;
-  final List<Coin> coins = [];
+  final String botId;
 
   @override
   _BotFinishedScreenState createState() => _BotFinishedScreenState();
@@ -16,13 +16,22 @@ class BotFinishedScreen extends StatefulWidget {
 
 class _BotFinishedScreenState extends State<BotFinishedScreen> {
 
+  Map<String, dynamic> tradeData;
+
   @override
   void initState() {
     super.initState();
+
+    getBotTradeData();
   }
 
   @override
   Widget build(BuildContext context) {
+//    final  Map<String, Object> navProps = ModalRoute.of(context).settings.arguments;
+//
+//    botId = navProps['botId'];
+//    getBotTradeData();
+
     return
       WillPopScope(
         onWillPop: () => Future.value(false),
@@ -43,17 +52,22 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
     );
   }
 
-//  Future<http.Response> fetchCoins() async {
-//    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/coins');
-//
-//    if (response.statusCode == 200) {
-//      final data = json.decode(response.body);
-//      final coins = (data['coins'] as List).map((c) => Coin.fromJson(c));
-//      setState(() {
-//        widget.coins.addAll(coins);
-//      });
-//    } else {
-//      throw Exception('Failed to fetch Coins');
-//    }
-//  }
+  Future<http.Response> getBotTradeData() async {
+    print(widget.botId);
+    final response = await http.get('http://localhost:3000/v1/trader-bot/trade-data?botId=${widget.botId}');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      print('*********');
+      print(data);
+      print('*********');
+
+      setState(() {
+        tradeData = data['tradeData'];
+      });
+    } else {
+      throw Exception('Failed to retrieve bot trade data');
+    }
+  }
 }
