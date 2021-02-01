@@ -44,7 +44,42 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text('Bot Finished Screen'),
+//              Text('Bot Finished Screen'),
+              Container(
+                width: 250,
+                height: 250,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 0), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '+2',
+                      style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    Text(
+                      '+2%',
+                      style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+              ),
             ]
           ),
         ),
@@ -53,7 +88,6 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
   }
 
   Future<http.Response> getBotTradeData() async {
-    print(widget.botId);
     final response = await http.get('http://localhost:3000/v1/trader-bot/trade-data?botId=${widget.botId}');
 
     if (response.statusCode == 200) {

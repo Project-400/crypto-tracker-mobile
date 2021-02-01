@@ -1,3 +1,4 @@
+import 'package:crypto_tracker/screens/bot-finished.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,6 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Subscribe'),
               onPressed: () {
                 Navigator.pushNamed(context, '/subscribe');
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
+            FlatButton(
+              child: Text('Skip to Finished'),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: '32b6ed51-b267-4d22-84c7-9b794028c21b')));
               },
               color: Colors.lightBlue,
               textColor: Colors.white,
