@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto_tracker/models/coin.dart';
 
@@ -15,6 +16,8 @@ class CoinsScreen extends StatefulWidget {
 }
 
 class _CoinsScreenState extends State<CoinsScreen> {
+
+  bool isUpdating = false;
 
   @override
   void initState() {
@@ -32,8 +35,40 @@ class _CoinsScreenState extends State<CoinsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('${widget.coins.length} Coins'),
-            Expanded(
+            if (isUpdating) Container(
+              child: Column(
+                children: [
+                  Container(
+                    child: SpinKitWave(
+                      color: Colors.blue,
+                      size: 60,
+                    ),
+                    margin: EdgeInsets.symmetric(vertical: 50),
+                  ),
+                  Text(
+                    'Fetching Coins..',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+//                    Container(
+//                      child: SvgPicture.asset(
+//                        'assets/bot.svg',
+//                        semanticsLabel: 'Preparing Bot',
+//                        placeholderBuilder: (BuildContext context) => Container(
+//                            padding: const EdgeInsets.all(30.0),
+//                            child: const CircularProgressIndicator()
+//                        ),
+//                        height: 300,
+//                      ),
+//                      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
+//                    )
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
+              ),
+            ),
+            if (!isUpdating) Text('${widget.coins.length} Coins'),
+            if (!isUpdating) Expanded(
               child: ListView.separated(
                 padding: EdgeInsets.all(10),
                 shrinkWrap: true,
@@ -98,14 +133,24 @@ class _CoinsScreenState extends State<CoinsScreen> {
     );
   }
 
-  Future<http.Response> fetchCoins() async {
-    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/coins');
+  Future<void> fetchCoins() async {
+    setState(() {
+      isUpdating = true;
+    });
+
+    final response = await http.get('http://localhost:15002/coins');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+
+      print("---------");
+      print(data);
+      print("---------");
+
       final coins = (data['coins'] as List).map((c) => Coin.fromJson(c));
       setState(() {
         widget.coins.addAll(coins);
+        isUpdating = false;
       });
     } else {
       throw Exception('Failed to fetch Coins');

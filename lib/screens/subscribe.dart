@@ -25,7 +25,7 @@ class SubscribeScreen extends StatefulWidget {
 
 class _SubscribeScreenState extends State<SubscribeScreen> {
 
-  Timer ticker;
+//  Timer ticker;
   bool isUpdating = false;
   bool isBotWorking = false;
   bool showBotDetails = false;
@@ -398,17 +398,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
   @override
   void dispose() {
-    if (ticker != null) ticker.cancel();
+//    if (ticker != null) ticker.cancel();
     widget.channel.sink.close();
     super.dispose();
   }
 
-  void setIntervalRequest() {
-//    getUpdatedBotDetails();
-    ticker = Timer.periodic(new Duration(seconds: 5), (timer) {
-      getUpdatedBotDetails();
-    });
-  }
+//  void setIntervalRequest() {
+////    getUpdatedBotDetails();
+//    ticker = Timer.periodic(new Duration(seconds: 5), (timer) {
+//      getUpdatedBotDetails();
+//    });
+//  }
 
   Future<http.Response> subscribeToBot() async {
     setState(() {
@@ -468,7 +468,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       print(data);
       print('*********');
 
-      if (ticker != null) ticker.cancel();
+//      if (ticker != null) ticker.cancel();
 
       setState(() {
         fullResponse = null;
