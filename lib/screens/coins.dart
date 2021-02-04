@@ -51,23 +51,14 @@ class _CoinsScreenState extends State<CoinsScreen> {
                       fontSize: 18,
                     ),
                   ),
-//                    Container(
-//                      child: SvgPicture.asset(
-//                        'assets/bot.svg',
-//                        semanticsLabel: 'Preparing Bot',
-//                        placeholderBuilder: (BuildContext context) => Container(
-//                            padding: const EdgeInsets.all(30.0),
-//                            child: const CircularProgressIndicator()
-//                        ),
-//                        height: 300,
-//                      ),
-//                      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
-//                    )
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
               ),
             ),
-            if (!isUpdating) Text('${widget.coins.length} Coins'),
+            if (!isUpdating) Container(
+              child: Text('${widget.coins.length} Currencies'),
+              padding: EdgeInsets.all(10),
+            ),
             if (!isUpdating) Expanded(
               child: ListView.separated(
                 padding: EdgeInsets.all(10),
