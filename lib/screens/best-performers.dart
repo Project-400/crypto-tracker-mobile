@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:crypto_tracker/models/price-change-stats.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 
 class BestPerformersScreen extends StatefulWidget {
@@ -36,8 +37,17 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(isUpdating ? 'Updating...' : ''),
-            Text('Count: ' + this.widget.stats.length.toString()),
+            Container(
+              child: Text('Showing the top 20 best performing assets in the past 5 minutes.'),
+              padding: EdgeInsets.all(10),
+            ),
+            if (isUpdating) Container(
+              child: SpinKitWave(
+                color: Colors.blue,
+                size: 40,
+              ),
+              margin: EdgeInsets.symmetric(vertical: 20),
+            ),
             Expanded(
               child: ListView.separated(
                 padding: EdgeInsets.all(10),
@@ -121,7 +131,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/trends/best-performers');
+    final response = await http.get('http://localhost:15003/trends/best-performers');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

@@ -134,10 +134,6 @@ class _CoinsScreenState extends State<CoinsScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      print("---------");
-      print(data);
-      print("---------");
-
       final coins = (data['coins'] as List).map((c) => Coin.fromJson(c));
       setState(() {
         widget.coins.addAll(coins);
