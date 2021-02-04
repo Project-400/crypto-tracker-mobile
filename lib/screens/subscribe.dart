@@ -27,7 +27,7 @@ class SubscribeScreen extends StatefulWidget {
 class _SubscribeScreenState extends State<SubscribeScreen> {
 
   Timer ticker;
-  bool isUpdating = false;
+  bool isUpdating = true;
   bool isBotWorking = false;
   bool showBotDetails = false;
   String selectedCurrencyPair;
@@ -60,59 +60,60 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         title: Text(widget.title),
       ),
       body: Center(
-//        child: Column(
-//          children: [
-//            Visibility(
-//              visible: botState != BotState.FINISHED,
-              child: ListView(
-//          mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Visibility (
-                    child: currencyPairSelector(context),
-                    visible: !isBotWorking && !isUpdating,
-                  ),
-                  if (!isBotWorking && !isUpdating) FlatButton(
-                    child: Text('Start Bot'),
-                    onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
-                    color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
-                    textColor: Colors.white,
-                  ),
-                  if (isBotWorking && !isUpdating) FlatButton(
-                    child: Text('Shutdown Bot'),
-                    onPressed: () {
-                      unsubscribeToBot();
-                    },
-                    color: Colors.lightBlue,
-                    textColor: Colors.white,
-                  ),
-                  Visibility (
-                    child: botDetails(context),
-                    visible: isBotWorking,
-                  ),
-                  Visibility (
-                    child: botLogs(context),
-                    visible: isBotWorking,
-                  ),
-                  Visibility(
-                    child: SpinKitWave(
-                      color: Colors.black,
+        child: ListView(
+          children: <Widget>[
+            Visibility (
+              child: currencyPairSelector(context),
+              visible: !isBotWorking && !isUpdating,
+            ),
+            if (!isBotWorking && !isUpdating) FlatButton(
+              child: Text('Start Bot'),
+              onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
+              color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
+              textColor: Colors.white,
+            ),
+            if (isBotWorking && !isUpdating) FlatButton(
+              child: Text('Shutdown Bot'),
+              onPressed: () {
+                unsubscribeToBot();
+              },
+              color: Colors.lightBlue,
+              textColor: Colors.white,
+            ),
+            Visibility (
+              child: botDetails(context),
+              visible: isBotWorking,
+            ),
+            Visibility (
+              child: botLogs(context),
+              visible: isBotWorking,
+            ),
+            Visibility(
+              child: Container(
+                child: Column(
+                  children: [
+                    SpinKitWave(
+                      color: Colors.blue,
                       size: 60,
                     ),
-                    visible: isUpdating && !isBotWorking,
-                  ),
-                  Visibility(
-                    child: Text('Preparing Bot'),
-                    visible: isUpdating && !isBotWorking,
-                  ),
-                ],
+                    Container(
+                      child: Text(
+                        'Preparing Bot..',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      margin: EdgeInsets.only(top: 40),
+                    )
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                height: 700, // TODO: Temporarily hard coded
               ),
-//            ),
-//            Visibility (
-//              child: botFinishedDetails(context),
-//              visible: botState == BotState.FINISHED,
-//            ),
-//          ],
-//        )
+              visible: isUpdating && !isBotWorking,
+            ),
+          ],
+        )
       ),
     );
   }
