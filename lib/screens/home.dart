@@ -14,31 +14,35 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              child: SvgPicture.asset(
-                'assets/bitcoin.svg',
-                semanticsLabel: 'Preparing Bot',
-                placeholderBuilder: (BuildContext context) => Container(
-                    padding: const EdgeInsets.all(30.0),
-                    child: const CircularProgressIndicator()
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          automaticallyImplyLeading: false,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: SvgPicture.asset(
+                  'assets/bitcoin.svg',
+                  semanticsLabel: 'Preparing Bot',
+                  placeholderBuilder: (BuildContext context) => Container(
+                      padding: const EdgeInsets.all(30.0),
+                      child: const CircularProgressIndicator()
+                  ),
+                  height: 300,
                 ),
-                height: 300,
+                padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
               ),
-              padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
-            ),
-            navigationButton(context, 'My Assets', '/coins'),
-            navigationButton(context, 'Best Performers', '/best-performers'),
-            navigationButton(context, 'Deploy Bot', '/subscribe'),
-            navigationButtonWithScreen(context, 'Skip to Finished', MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: '32b6ed51-b267-4d22-84c7-9b794028c21b'))),
-          ],
+              navigationButton(context, 'My Assets', '/coins'),
+              navigationButton(context, 'Best Performers', '/best-performers'),
+              navigationButton(context, 'Deploy Bot', '/subscribe'),
+              navigationButtonWithScreen(context, 'Skip to Finished', MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: '32b6ed51-b267-4d22-84c7-9b794028c21b'))),
+            ],
+          ),
         ),
       ),
     );

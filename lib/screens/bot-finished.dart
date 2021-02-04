@@ -100,6 +100,24 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),
               ),
+              Container(
+                child: RaisedButton(
+                  child: Text(
+                    'Done',
+                    style: TextStyle(
+                        fontSize: 16
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/');
+                  },
+                  color: Colors.lightBlue,
+                  textColor: Colors.white,
+                ),
+                width: double.infinity,
+                margin: EdgeInsets.only(top: 50),
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+              )
             ]
           ),
         ),
