@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:math';
 
 import 'package:crypto_tracker/constants/enums.dart';
 import 'package:crypto_tracker/models/bot-log.dart';
@@ -13,6 +11,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:enum_to_string/enum_to_string.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
@@ -27,7 +26,7 @@ class SubscribeScreen extends StatefulWidget {
 class _SubscribeScreenState extends State<SubscribeScreen> {
 
   Timer ticker;
-  bool isUpdating = true;
+  bool isUpdating = false;
   bool isBotWorking = false;
   bool showBotDetails = false;
   String selectedCurrencyPair;
@@ -42,6 +41,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   Map<String, dynamic> tradeData;
   String currentPrice;
   List<BotLog> botLogEvents = [];
+  List<BotLog> botPrepEvents = [];
   BotState botState = BotState.NONE;
 
   @override
@@ -92,23 +92,35 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: Container(
                 child: Column(
                   children: [
-                    SpinKitWave(
-                      color: Colors.blue,
-                      size: 60,
+                    Container(
+                      child: SpinKitWave(
+                        color: Colors.blue,
+                        size: 60,
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 50),
+                    ),
+                    Text(
+                      'Preparing Bot..',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
                     ),
                     Container(
-                      child: Text(
-                        'Preparing Bot..',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
+                      child: SvgPicture.asset(
+                          'assets/bot.svg',
+                          semanticsLabel: 'Preparing Bot',
+                          placeholderBuilder: (BuildContext context) => Container(
+                            padding: const EdgeInsets.all(30.0),
+                            child: const CircularProgressIndicator()
+                          ),
+                          height: 300,
                       ),
-                      margin: EdgeInsets.only(top: 40),
+                      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
                     )
                   ],
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),
-                height: 700, // TODO: Temporarily hard coded
+//                height: 700, // TODO: Temporarily hard coded
               ),
               visible: isUpdating && !isBotWorking,
             ),
