@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto_tracker/models/coin.dart';
 
 class BotFinishedScreen extends StatefulWidget {
   BotFinishedScreen({Key key, this.title, this.botId, }) : super(key: key);
@@ -27,11 +26,6 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
 
   @override
   Widget build(BuildContext context) {
-//    final  Map<String, Object> navProps = ModalRoute.of(context).settings.arguments;
-//
-//    botId = navProps['botId'];
-//    getBotTradeData();
-
     return
       WillPopScope(
         onWillPop: () => Future.value(false),
@@ -46,8 +40,8 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
             children: <Widget>[
 //              Text('Bot Finished Screen'),
               Container(
-                width: 250,
-                height: 250,
+                width: 300,
+                height: 300,
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -62,15 +56,41 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
                 ),
                 child: Column(
                   children: [
+//                    Row(
+//                      children: [
+//                        Text(
+//                          '${tradeData['priceDifference']}',
+//                          style: TextStyle(
+//                              fontSize: 40,
+//                              fontWeight: FontWeight.bold
+//                          ),
+//                        ),
+//                        Text(
+//                          ' ${tradeData['base']}',
+//                          style: TextStyle(
+//                              fontSize: 30,
+//                              fontWeight: FontWeight.bold
+//                          ),
+//                        ),
+//                      ],
+//                      mainAxisAlignment: MainAxisAlignment.center,
+//                    ),
                     Text(
-                      '+2',
+                      '${tradeData['priceDifference']}',
                       style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold
                       ),
                     ),
                     Text(
-                      '+2%',
+                      ' ${tradeData['base']}',
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    Text(
+                      '${tradeData['percentageDifference'].toStringAsFixed(2)}%',
                       style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold

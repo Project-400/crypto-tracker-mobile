@@ -69,15 +69,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 children: <Widget>[
                   Visibility (
                     child: currencyPairSelector(context),
-                    visible: !isBotWorking,
+                    visible: !isBotWorking && !isUpdating,
                   ),
-                  if (!isBotWorking) FlatButton(
+                  if (!isBotWorking && !isUpdating) FlatButton(
                     child: Text('Start Bot'),
                     onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
                     color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
                     textColor: Colors.white,
                   ),
-                  if (isBotWorking) FlatButton(
+                  if (isBotWorking && !isUpdating) FlatButton(
                     child: Text('Shutdown Bot'),
                     onPressed: () {
                       unsubscribeToBot();
@@ -85,13 +85,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                     color: Colors.lightBlue,
                     textColor: Colors.white,
                   ),
-//            Visibility(
-//              child: SpinKitWave(
-//                color: Colors.black,
-//                size: 50.0,
-//              ),
-//              visible: isUpdating,
-//            ),
                   Visibility (
                     child: botDetails(context),
                     visible: isBotWorking,
@@ -99,6 +92,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                   Visibility (
                     child: botLogs(context),
                     visible: isBotWorking,
+                  ),
+                  Visibility(
+                    child: SpinKitWave(
+                      color: Colors.black,
+                      size: 60,
+                    ),
+                    visible: isUpdating && !isBotWorking,
+                  ),
+                  Visibility(
+                    child: Text('Preparing Bot'),
+                    visible: isUpdating && !isBotWorking,
                   ),
                 ],
               ),
