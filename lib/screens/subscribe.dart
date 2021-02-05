@@ -12,6 +12,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class SubscribeScreen extends StatefulWidget {
   SubscribeScreen({Key key, this.title}) : super(key: key);
@@ -26,6 +27,7 @@ class SubscribeScreen extends StatefulWidget {
 class _SubscribeScreenState extends State<SubscribeScreen> {
 
 //  Timer ticker;
+  Timer timer;
   bool isUpdating = false;
   bool isBotWorking = false;
   bool showBotDetails = false;
@@ -44,6 +46,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   List<BotLog> botLogEvents = [];
   List<BotLog> botPrepEvents = [];
   BotState botState = BotState.NONE;
+  int secondsTrading = 0;
 
   @override
   void initState() {
@@ -71,9 +74,32 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               'Start Bot',
               () => selectedCurrencyPair == null || quoteAmount == null ? null : subscribeToBot()
             ),
-            if (isBotWorking && !isUpdating) botButton(
-              'Shutdown Bot',
-              () => unsubscribeToBot()
+            if (isBotWorking && !isUpdating) Row(
+                children: [
+                  Expanded(
+                    child: botButton(
+                        'Shutdown Bot',
+                            () => unsubscribeToBot()
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      child: Center(
+                        child: Text(
+                            secondsTrading.toString(),
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold
+                            )
+                        ),
+                      ),
+                      color: Colors.grey,
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                    )
+                  )
+                ],
+//              mainAxisAlignment: MainAxisAlignment.center
             ),
             Visibility (
               child: botDetails(context),
@@ -140,7 +166,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         textColor: Colors.white,
       ),
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
     );
   }
 
@@ -395,7 +421,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                             ),
                             Align(
                               child: Text(
-                                '${log.time.hour}:${log.time.minute}:${log.time.second}',
+                                '${DateFormat.Hms().format(log.time)}',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 12
@@ -436,6 +462,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   @override
   void dispose() {
 //    if (ticker != null) ticker.cancel();
+    if (timer != null) timer.cancel();
     widget.channel.sink.close();
     super.dispose();
   }
@@ -446,6 +473,14 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 //      getUpdatedBotDetails();
 //    });
 //  }
+
+  void timerCount() {
+    timer = Timer.periodic(new Duration(seconds: 1), (timer) {
+      setState(() {
+        secondsTrading = secondsTrading + 1;
+      });
+    });
+  }
 
   Future<http.Response> subscribeToBot() async {
     setState(() {
@@ -486,7 +521,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       isUpdating = false;
     });
 
-//    setIntervalRequest();
+    timerCount();
   }
 
   Future<http.Response> unsubscribeToBot() async {
