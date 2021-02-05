@@ -113,7 +113,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 ],
 //              mainAxisAlignment: MainAxisAlignment.center
             ),
-            Container(
+            if (isBotWorking) Container(
               child: Divider(
                 color: Color(0xffcccccc),
                 height: 1,
@@ -123,11 +123,18 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               ),
               margin: EdgeInsets.only(bottom: 15)
             ),
+            if (isBotWorking) Container(
+              child: SpinKitPulse(
+                color: Colors.blue,
+                size: 30,
+              ),
+              margin: EdgeInsets.only(bottom: 10),
+            ),
             Visibility (
               child: botDetails(context),
               visible: isBotWorking,
             ),
-            Container(
+            if (isBotWorking) Container(
                 child: Divider(
                   color: Color(0xffcccccc),
                   height: 1,
