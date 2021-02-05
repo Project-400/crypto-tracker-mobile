@@ -32,6 +32,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   String selectedCurrencyPair;
   String clientSocketId;
   double quoteAmount;
+  double percentageLoss;
   bool repeatedlyTrade = false;
   bool isProfiting = false;
   double priceDifferenceInUSD = 1.89;
@@ -66,19 +67,13 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               child: currencyPairSelector(context),
               visible: !isBotWorking && !isUpdating,
             ),
-            if (!isBotWorking && !isUpdating) FlatButton(
-              child: Text('Start Bot'),
-              onPressed: () => selectedCurrencyPair == null ? null : subscribeToBot(),
-              color: selectedCurrencyPair == null ? Colors.grey : Colors.lightBlue,
-              textColor: Colors.white,
+            if (!isBotWorking && !isUpdating) botButton(
+              'Start Bot',
+              () => selectedCurrencyPair == null || quoteAmount == null ? null : subscribeToBot()
             ),
-            if (isBotWorking && !isUpdating) FlatButton(
-              child: Text('Shutdown Bot'),
-              onPressed: () {
-                unsubscribeToBot();
-              },
-              color: Colors.lightBlue,
-              textColor: Colors.white,
+            if (isBotWorking && !isUpdating) botButton(
+              'Shutdown Bot',
+              () => unsubscribeToBot()
             ),
             Visibility (
               child: botDetails(context),
@@ -130,6 +125,25 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
+
+  Widget botButton(String text, Function onPressed) {
+    return Container(
+      child: RaisedButton(
+        child: Text(
+          text,
+          style: TextStyle(
+              fontSize: 16
+          ),
+        ),
+        onPressed: onPressed,
+        color: selectedCurrencyPair == null || quoteAmount == null ? Colors.grey : Colors.lightBlue,
+        textColor: Colors.white,
+      ),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+    );
+  }
+
   Widget currencyPairSelector(BuildContext context) {
     return Column(
       children: [
@@ -144,13 +158,23 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ),
           padding: EdgeInsets.all(10),
         ),
-        Container (
+        Container(
           child: TextField(
             decoration: InputDecoration(
             labelText: 'Quote Quantity',
               hintText: '0.0001'
             ),
             onChanged: (amount) => quoteAmount = double.parse(amount),
+          ),
+          padding: EdgeInsets.all(10),
+        ),
+        Container(
+          child: TextField(
+            decoration: InputDecoration(
+            labelText: 'Max Percentage Loss (Default 1%)',
+              hintText: '1'
+            ),
+            onChanged: (amount) => percentageLoss = double.parse(amount),
           ),
           padding: EdgeInsets.all(10),
         ),
@@ -420,7 +444,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
     print('Sending request to bot to trade $selectedCurrencyPair with $quoteAmount quote amount');
 
-    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId');
+    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId&percentageLoss=$percentageLoss');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -470,6 +494,8 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
 //      if (ticker != null) ticker.cancel();
 
+      String botId = bot['botId'];
+
       setState(() {
         fullResponse = null;
         bot = null;
@@ -477,6 +503,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         isBotWorking = false;
         quoteAmount = null;
       });
+
+//      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: botId)));
+//      });
     } else {
       throw Exception('Failed to unsubscribe from Bot');
     }
