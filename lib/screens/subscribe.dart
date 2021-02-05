@@ -78,32 +78,64 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 children: [
                   Expanded(
                     child: botButton(
-                        'Shutdown Bot',
-                            () => unsubscribeToBot()
+                      'Shutdown Bot',
+                      () => unsubscribeToBot()
                     ),
                   ),
                   Expanded(
                     child: Container(
-                      child: Center(
-                        child: Text(
-                            secondsTrading.toString(),
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Icon(
+                              Icons.access_time,
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                  secondsTrading.toString(),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold
+                                  )
+                              ),
                             )
-                        ),
+                          ),
+                        ],
+//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       ),
                       color: Colors.grey,
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                       margin: EdgeInsets.symmetric(horizontal: 10),
                     )
-                  )
+                  ),
                 ],
 //              mainAxisAlignment: MainAxisAlignment.center
+            ),
+            Container(
+              child: Divider(
+                color: Color(0xffcccccc),
+                height: 1,
+                thickness: 1,
+                indent: 10,
+                endIndent: 10,
+              ),
+              margin: EdgeInsets.only(bottom: 15)
             ),
             Visibility (
               child: botDetails(context),
               visible: isBotWorking,
+            ),
+            Container(
+                child: Divider(
+                  color: Color(0xffcccccc),
+                  height: 1,
+                  thickness: 1,
+                  indent: 10,
+                  endIndent: 10,
+                ),
+                margin: EdgeInsets.only(top: 15)
             ),
             Visibility (
               child: botLogs(context),
