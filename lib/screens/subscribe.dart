@@ -136,7 +136,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ),
         ),
         onPressed: onPressed,
-        color: selectedCurrencyPair == null || quoteAmount == null ? Colors.grey : Colors.lightBlue,
+        color: isBotWorking ? Colors.red : Colors.lightBlue,
         textColor: Colors.white,
       ),
       width: double.infinity,
@@ -151,7 +151,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           child: DropdownSearch<String>(
             mode: Mode.BOTTOM_SHEET,
             showSelectedItem: true,
-            items: ['CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+            items: ['COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
             label: 'Currency Pair',
             hint: 'The crypto currency you want to trade',
             onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
@@ -263,7 +263,10 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ],
         ),
         Center(
-          child: Text(isBotWorking ? 'The bot is currently $botState' : ''),
+          child: Container(
+            child: Text(isBotWorking ? 'The bot is currently ${botState.toString().split('.').last}' : ''),
+            margin: EdgeInsets.symmetric(vertical: 10),
+          )
         ),
         Center(
           child: Text(isBotWorking ? '1 ${bot['base']} = $currentPrice ${bot['quote']}' : ''),
@@ -277,7 +280,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           ],
         ),
 //        Text(fullResponse != null ? fullResponse.toString() : 'Waiting..'),
-        Text(botState.toString().split('.').last),
+//        Text(botState.toString().split('.').last),
       ]
     );
   }
@@ -289,19 +292,26 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  isProfiting ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: 30,
-                ),
+//                Icon(
+//                  isProfiting ? Icons.arrow_upward : Icons.arrow_downward,
+//                  size: 30,
+//                ),
                 Text(
-                  tradeData != null ? '${tradeData['priceDifference']} (${tradeData['percentageDifference'].toStringAsFixed(2)}%)' : '',
+                  tradeData != null ? '${tradeData['priceDifference']}' : '',
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold
                   ),
-                )
+                ),
               ],
               mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            Text(
+              tradeData != null ? '(${tradeData['percentageDifference'].toStringAsFixed(2)}%)' : '',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold
+              ),
             ),
             Row(
               children: [
@@ -309,23 +319,23 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             ),
-            Container(
-              child: Row(
-                children: [
-                  Text(
-                      'Spent: ${isBotWorking ? bot['quoteQty'] : '0'}'
-                  ),
-                  Text(
-                      'Current Value: ${isBotWorking ? bot['quoteQty'] + 0.1 : 0}'
-                  )
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              ),
-              padding: EdgeInsets.only(top: 20),
-            )
+//            Container(
+//              child: Row(
+//                children: [
+//                  Text(
+//                      'Spent: ${isBotWorking ? bot['quoteQty'] : '0'}'
+//                  ),
+//                  Text(
+//                      'Current Value: ${isBotWorking ? bot['quoteQty'] + 0.1 : 0}'
+//                  )
+//                ],
+//                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//              ),
+//              padding: EdgeInsets.only(top: 20),
+//            )
           ],
         ),
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
@@ -339,12 +349,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     return Column(
       children: [
         Center(
-          child: Text(
+          child: Container(
+            child: Text(
               'Logs',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20
               ),
+            ),
+            padding: EdgeInsets.only(top: 20),
           ),
         ),
         ListView.separated(
@@ -505,7 +518,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       });
 
 //      Future.delayed(const Duration(seconds: 3), () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: botId)));
+//        Navigator.push(context, MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: botId)));
 //      });
     } else {
       throw Exception('Failed to unsubscribe from Bot');

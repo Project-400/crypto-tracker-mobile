@@ -38,7 +38,34 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-//              Text('Bot Finished Screen'),
+              Container(
+                child: Row(
+                  children: [
+                    Text(
+                      'Trading has finished. Here is the bot\'s ',
+                      style: TextStyle(
+                          fontSize: 15
+                      ),
+                    ),
+                    if (tradeData['priceDifference'] >= 0) Text(
+                      'profit:',
+                      style: TextStyle(
+                          fontSize: 15,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    if (tradeData['priceDifference'] < 0) Text(
+                      'loss:',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ],
+                    mainAxisAlignment: MainAxisAlignment.center
+                ),
+                margin: EdgeInsets.only(bottom: 20),
+              ),
               Container(
                 width: 300,
                 height: 300,
@@ -75,27 +102,39 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
 //                      ],
 //                      mainAxisAlignment: MainAxisAlignment.center,
 //                    ),
-                    Text(
-                      '${tradeData['priceDifference']}',
-                      style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold
-                      ),
+                    Row(
+                      children: [
+                        if (tradeData['priceDifference'] >= 0) Text(
+                          '+',
+                          style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                          '${tradeData['priceDifference']}',
+                          style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.center
                     ),
                     Text(
-                      ' ${tradeData['base']}',
+                      ' ${tradeData['quote']}',
                       style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold
                       ),
                     ),
-                    Text(
-                      '${tradeData['percentageDifference'].toStringAsFixed(2)}%',
-                      style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold
-                      ),
-                    ),
+//                    Text(
+//                      '${tradeData['percentageDifference'].toStringAsFixed(2)}%',
+//                      style: TextStyle(
+//                          fontSize: 26,
+//                          fontWeight: FontWeight.bold
+//                      ),
+//                    ),
                   ],
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),
