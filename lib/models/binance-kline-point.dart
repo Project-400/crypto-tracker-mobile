@@ -1,5 +1,7 @@
 import 'dart:core';
 
+import 'package:trading_chart/entity/k_line_entity.dart';
+
 class BinanceKlinePoint {
 
   String openPrice;
@@ -41,4 +43,15 @@ class BinanceKlinePoint {
         openTime = values[0],
         closeTime = values[6];
 
+  KLineEntity toK_Line() {
+    return KLineEntity.fromJson({
+      'open': double.parse(openPrice),
+      'close': double.parse(closePrice),
+      'high': double.parse(highPrice),
+      'low': double.parse(lowPrice),
+      'vol': double.parse(volume),
+      'amount': double.parse(takerBuyBaseAssetVolume),
+      'time': openTime
+    });
+  }
 }
