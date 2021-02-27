@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto_tracker/models/binance-kline-point.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:trading_chart/entity/k_line_entity.dart';
 import 'package:trading_chart/k_chart_widget.dart';
@@ -53,9 +54,10 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     }),
   ];
 
-  List<KLineEntity> klines = [];
-
   bool isUpdating = false;
+  String selectedCurrencyPair;
+
+  List<KLineEntity> klines = [];
   bool showLoading = true;
   MainState _mainState = MainState.NONE;
   SecondaryState _secondaryState = SecondaryState.NONE;
@@ -65,8 +67,6 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   @override
   void initState() {
     super.initState();
-
-    getKlineData();
   }
 
   @override
@@ -84,6 +84,17 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                 children: <Widget>[
                   Text('Price Charts'),
                   Container(
+                    child: DropdownSearch<String>(
+                      mode: Mode.BOTTOM_SHEET,
+                      showSelectedItem: true,
+                      items: ['ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+                      label: 'Currency Pair',
+                      hint: 'The crypto currency you want to trade',
+                      onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
+                    ),
+                    padding: EdgeInsets.all(10),
+                  ),
+                  if (klines.length > 0) Container(
                     height: 600,
                     width: double.infinity,
                     child: KChartWidget(
@@ -112,14 +123,22 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
       );
   }
 
-  Future<http.Response> getKlineData() async {
+  void setSelectedCurrencyPair(String pair) {
+    setState(() {
+      selectedCurrencyPair = pair;
+
+      getKlineData(selectedCurrencyPair);
+    });
+  }
+
+  Future<http.Response> getKlineData(String pair) async {
     setState(() {
       isUpdating = true;
     });
 
     print('Sending request to get kline data.');
 
-    final response = await http.get('https://api.binance.com/api/v3/klines?symbol=ADAUSDT&interval=1m');
+    final response = await http.get('https://api.binance.com/api/v3/klines?symbol=$pair&interval=1m');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
