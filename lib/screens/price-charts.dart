@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto_tracker/models/binance-kline-point.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:trading_chart/entity/k_line_entity.dart';
 import 'package:trading_chart/k_chart_widget.dart';
 import 'package:http/http.dart' as http;
@@ -55,7 +56,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   ];
 
   bool isUpdating = false;
-  String selectedCurrencyPair;
+  String selectedCurrencyPair = 'BTCUSDT';
   String selectedInterval = '1m';
 
   List<KLineEntity> klines = [];
@@ -68,52 +69,40 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   @override
   void initState() {
     super.initState();
+
+    getKlineData(selectedCurrencyPair, selectedInterval);
   }
 
   @override
   Widget build(BuildContext context) {
     return
       WillPopScope(
-        onWillPop: () => Future.value(false),
+//        onWillPop: selectedCurrencyPair != null ? () => Future.value(false) : null,
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
           ),
-          body: Center(
-            child:
-            Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('Price Charts'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          child: intervalButton('1m', () => setInterval('1m'))
-                      ),
-                      Expanded(
-                          child: intervalButton('1h', () => setInterval('1h'))
-                      ),
-                      Expanded(
-                          child: intervalButton('1d', () => setInterval('1d'))
-                      ),
-                    ],
-                  ),
-                  Container(
-                    child: DropdownSearch<String>(
-                      mode: Mode.BOTTOM_SHEET,
-                      showSelectedItem: true,
-                      items: ['ADAUSDT', 'AAVEUSDT', 'ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
-                      label: 'Currency Pair',
-                      hint: 'The crypto currency you want to trade',
-                      onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
-                    ),
-                    padding: EdgeInsets.all(10),
-                  ),
-                  if (klines.length > 0) Container(
-                    height: 600,
-                    width: double.infinity,
-                    child: KChartWidget(
+          body:
+          ListView(
+            children: <Widget>[
+              intervalButtons(),
+              Container(
+                child: DropdownSearch<String>(
+                  mode: Mode.BOTTOM_SHEET,
+                  showSelectedItem: true,
+                  items: ['ADAUSDT', 'AAVEUSDT', 'ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+                  label: 'Currency Pair',
+                  hint: 'The crypto currency you want to trade',
+                  onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
+                ),
+                padding: EdgeInsets.all(10),
+              ),
+              Container(
+                height: 600,
+//                width: double.infinity,
+                child: Stack(
+                  children: [
+                    KChartWidget(
                       klines,// Required，Data must be an ordered list，(history=>now)
                       isLine: isLine,// Decide whether it is k-line or time-sharing
                       mainState: _mainState,// Decide what the main view shows
@@ -131,9 +120,17 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                         print('drag');
                       },// true is on Drag.Don't load data while Dragging.
                     ),
-                  ),
-                ]
-            ),
+                    if (isUpdating) Container(
+                      child: SpinKitWave(
+                        color: Colors.blue,
+                        size: 60,
+                      ),
+//                      margin: EdgeInsets.symmetric(vertical: 200),
+                    ),
+                  ],
+                ),
+              ),
+            ]
           ),
         ),
       );
@@ -148,12 +145,36 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
               fontSize: 16
           ),
         ),
-        onPressed: onPressed,
+        onPressed: selectedInterval == text ? null : onPressed,
         color: Colors.lightBlue,
         textColor: Colors.white,
+        disabledColor: Colors.grey,
       ),
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    );
+  }
+
+  Widget intervalButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+            child: intervalButton('1m', () => setInterval('1m'))
+        ),
+        Expanded(
+            child: intervalButton('1h', () => setInterval('1h'))
+        ),
+        Expanded(
+            child: intervalButton('1d', () => setInterval('1d'))
+        ),
+        Expanded(
+            child: intervalButton('1w', () => setInterval('1w'))
+        ),
+        Expanded(
+            child: intervalButton('1M', () => setInterval('1M'))
+        ),
+      ],
     );
   }
 
@@ -167,6 +188,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   void setInterval(String interval) {
     setState(() {
+      klines = [];
       selectedInterval = interval;
 
       getKlineData(selectedCurrencyPair, selectedInterval);
@@ -174,6 +196,8 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   Future<http.Response> getKlineData(String pair, String interval) async {
+    if (selectedCurrencyPair == null) return null;
+
     setState(() {
       isUpdating = true;
     });
