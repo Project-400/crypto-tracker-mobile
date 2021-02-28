@@ -27,4 +27,10 @@ class WalletValuation {
     return this;
   }
 
+  WalletValuation sortAlphabetically(bool desc) {
+    values.sort((a, b) => a['coin'].compareTo(b['coin']));
+    if (desc) values = values.reversed.toList();
+    return this;
+  }
+
 }

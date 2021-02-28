@@ -73,7 +73,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
               child: DropdownSearch<String>(
                 mode: Mode.BOTTOM_SHEET,
                 showSelectedItem: true,
-                items: [ 'Value - ASC', 'Value - DESC', 'Coin Count - ASC', 'Coin Count - DESC' ],
+                items: [ 'Value - ASC', 'Value - DESC', 'Coin Count - ASC', 'Coin Count - DESC', 'Alphabetically - ASC', 'Alphabetically - DESC' ],
                 label: 'Sort By',
                 hint: 'The crypto currency you want to trade',
                 onChanged: (sortOption) => setSortOption(sortOption),
@@ -181,6 +181,8 @@ class _CoinsScreenState extends State<CoinsScreen> {
       if (sortOption == 'Value - DESC') walletValuation.sortByValue(true);
       if (sortOption == 'Coin Count - ASC') walletValuation.sortByCoinCount(false);
       if (sortOption == 'Coin Count - DESC') walletValuation.sortByCoinCount(true);
+      if (sortOption == 'Alphabetically - ASC') walletValuation.sortAlphabetically(false);
+      if (sortOption == 'Alphabetically - DESC') walletValuation.sortAlphabetically(true);
     });
   }
 
