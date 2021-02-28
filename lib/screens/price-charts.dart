@@ -11,9 +11,10 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PriceChartsScreen extends StatefulWidget {
-  PriceChartsScreen({ Key key, this.title }) : super(key: key);
+  PriceChartsScreen({ Key key, this.title, this.symbol }) : super(key: key);
 
   final String title;
+  String symbol;
   final WebSocketChannel channel = IOWebSocketChannel.connect('wss://stream.binance.com:9443/ws');
 
   @override
@@ -22,6 +23,7 @@ class PriceChartsScreen extends StatefulWidget {
 
 class _PriceChartsScreenState extends State<PriceChartsScreen> {
   bool isUpdating = false;
+  String lastCurrencyPair;
   String selectedCurrencyPair = 'BTCUSDT';
   String subscribedPair;
   String subscribedInterval;
@@ -38,6 +40,8 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.symbol != null) selectedCurrencyPair = widget.symbol;
 
     widget.channel.stream.listen((received) {
       _receivePriceUpdate(received);
@@ -69,6 +73,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                   label: 'Currency Pair',
                   hint: 'The crypto currency you want to trade',
                   onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
+                  selectedItem: selectedCurrencyPair,
                 ),
                 padding: EdgeInsets.all(10),
               ),
@@ -126,7 +131,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
         disabledColor: Colors.grey,
       ),
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: EdgeInsets.only(top: 2, bottom: 2, left: 4, right: 4),
     );
   }
 
@@ -145,7 +150,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
         disabledColor: Colors.grey,
       ),
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: EdgeInsets.only(bottom: 2, left: 4, right: 4),
     );
   }
 
@@ -188,6 +193,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   void setSelectedCurrencyPair(String pair) {
     setState(() {
+      lastCurrencyPair = selectedCurrencyPair;
       selectedCurrencyPair = pair;
 
       getKlineData(selectedCurrencyPair, selectedInterval);
@@ -281,9 +287,9 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   void _subscribeToSymbolPrice(String symbol, String interval) {
-    if (subscribedPair != null) {
-      print('UNSUB from ${selectedCurrencyPair.toLowerCase()}@kline_$subscribedInterval');
-      widget.channel.sink.add('{ "method": "UNSUBSCRIBE", "params": [ "${selectedCurrencyPair.toLowerCase()}@kline_$subscribedInterval" ], "id": 1 }');
+    if (lastCurrencyPair != null) {
+      print('UNSUB from ${lastCurrencyPair.toLowerCase()}@kline_$subscribedInterval');
+      widget.channel.sink.add('{ "method": "UNSUBSCRIBE", "params": [ "${lastCurrencyPair.toLowerCase()}@kline_$subscribedInterval" ], "id": 1 }');
     }
     print('SUB to ${symbol.toLowerCase()}@kline_$interval');
     widget.channel.sink.add('{ "method": "SUBSCRIBE", "params": [ "${symbol.toLowerCase()}@kline_$interval" ], "id": 1 }');
