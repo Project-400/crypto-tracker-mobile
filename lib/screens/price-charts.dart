@@ -58,12 +58,12 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   bool isUpdating = false;
   String selectedCurrencyPair = 'BTCUSDT';
   String selectedInterval = '1m';
+  bool isLine = false;
 
   List<KLineEntity> klines = [];
   bool showLoading = true;
   MainState _mainState = MainState.NONE;
   SecondaryState _secondaryState = SecondaryState.NONE;
-  bool isLine = false;
   bool isChinese = false;
 
   @override
@@ -86,6 +86,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
           ListView(
             children: <Widget>[
               intervalButtons(),
+              chartTypeButtons(),
               Container(
                 child: DropdownSearch<String>(
                   mode: Mode.BOTTOM_SHEET,
@@ -155,6 +156,25 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     );
   }
 
+  Widget chartTypeButton(String text, bool isLine) {
+    return Container(
+      child: RaisedButton(
+        child: Text(
+          text,
+          style: TextStyle(
+              fontSize: 16
+          ),
+        ),
+        onPressed: this.isLine == isLine ? null : () => setChartType(isLine),
+        color: Colors.lightBlue,
+        textColor: Colors.white,
+        disabledColor: Colors.grey,
+      ),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    );
+  }
+
   Widget intervalButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -178,6 +198,20 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     );
   }
 
+  Widget chartTypeButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+            child: chartTypeButton('KLine', false)
+        ),
+        Expanded(
+            child: chartTypeButton('Line', true)
+        )
+      ],
+    );
+  }
+
   void setSelectedCurrencyPair(String pair) {
     setState(() {
       selectedCurrencyPair = pair;
@@ -192,6 +226,16 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
       selectedInterval = interval;
 
       getKlineData(selectedCurrencyPair, selectedInterval);
+    });
+  }
+
+  void setChartType(bool isLine) {
+    print('Set chart type: $isLine');
+    setState(() {
+//      klines = [];
+      this.isLine = isLine;
+
+//      getKlineData(selectedCurrencyPair, selectedInterval);
     });
   }
 
