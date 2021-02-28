@@ -7,11 +7,14 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:trading_chart/entity/k_line_entity.dart';
 import 'package:trading_chart/k_chart_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class PriceChartsScreen extends StatefulWidget {
   PriceChartsScreen({ Key key, this.title }) : super(key: key);
 
   final String title;
+  final WebSocketChannel channel = IOWebSocketChannel.connect('wss://stream.binance.com:9443/ws');
 
   @override
   _PriceChartsScreenState createState() => _PriceChartsScreenState();
@@ -57,6 +60,8 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   bool isUpdating = false;
   String selectedCurrencyPair = 'BTCUSDT';
+  String subscribedPair;
+  String subscribedInterval;
   String selectedInterval = '1m';
   bool isLine = false;
 
@@ -71,6 +76,14 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     super.initState();
 
     getKlineData(selectedCurrencyPair, selectedInterval);
+
+    widget.channel.stream.listen((received) {
+      _receivePriceUpdate(received);
+    });
+
+    Future.delayed(const Duration(seconds: 3), () => {
+      _subscribeToSymbolPrice(selectedCurrencyPair, selectedInterval)
+    });
   }
 
   @override
@@ -115,7 +128,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                       },// Called when the data scrolls to the end. When a is true, it means the user is pulled to the end of the right side of the data. When a
                       // is false, it means the user is pulled to the end of the left side of the data.
                       maDayList: [5,10,20],// Display of MA,This parameter must be equal to DataUtil.calculate‘s maDayList
-                      bgColor: [Colors.black, Colors.black],// The background color of the chart is gradient
+                      bgColor: [Color(0xff22292e), Color(0xff22292e)],// The background color of the chart is gradient
                       isChinese: false,// Graphic language
                       isOnDrag: (isDrag){
                         print('drag');
@@ -257,7 +270,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
       print(data);
       print('*********');
 
-      final klinePoints = (data as List<dynamic>).map((d) => BinanceKlinePoint.fromJson(d).toK_Line()).toList();
+      final klinePoints = (data as List<dynamic>).map((d) => BinanceKlinePoint.fromBinanceHttp(d).toK_Line()).toList();
 
       setState(() {
         klines = klinePoints.toList();
@@ -269,6 +282,52 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     setState(() {
       isUpdating = false;
     });
+  }
+
+  void _receivePriceUpdate(String message) {
+    print(message);
+
+    setState(() {
+      try {
+        Map<String, dynamic> data = json.decode(message);
+        print(data);
+
+        if (data['e'] != null && data['e'] == 'kline' && data['s'] != null && data['s'] == selectedCurrencyPair) {
+          print('LOOKS OK');
+          KLineEntity kline = BinanceKlinePoint.fromBinanceWs(data['k']).toK_Line();
+          print('KLINE ****');
+          print(kline);
+
+          KLineEntity lastKline = klines.last;
+          if (kline.time == lastKline.time) klines.last = kline;
+          else klines.add(kline);
+        }
+      } catch (e) {
+        print(e);
+        print('Websocket message is not in JSON format');
+      }
+    });
+  }
+
+  void _subscribeToSymbolPrice(String symbol, String interval) {
+    print('SUB to ${symbol.toLowerCase()}@kline_$interval');
+    widget.channel.sink.add('{ "method": "SUBSCRIBE", "params": [ "${symbol.toLowerCase()}@kline_$interval" ], "id": 1 }');
+    if (subscribedPair != null) {
+      print('UNSUB from ${selectedCurrencyPair.toLowerCase()}@kline_$subscribedInterval');
+      widget.channel.sink.add(
+          '{ "method": "UNSUBSCRIBE", "params": [ "${selectedCurrencyPair
+              .toLowerCase()}@kline_$subscribedInterval" ], "id": 1 }');
+    }
+    setState(() {
+      subscribedPair = symbol;
+      subscribedInterval = interval;
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.channel.sink.close();
+    super.dispose();
   }
 
 }
