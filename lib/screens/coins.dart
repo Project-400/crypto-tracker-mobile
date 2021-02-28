@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto_tracker/models/coins-valuation.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
@@ -60,7 +61,24 @@ class _CoinsScreenState extends State<CoinsScreen> {
             ),
             if (!isUpdating) Container(
 //              child: Text('${widget.coins.length} Currencies'),
-              child: Text('${walletValuation.values.length} Currencies'),
+              child: Column(
+                children: [
+                  Text('${walletValuation.values.length} Currencies'),
+                  Text('\$${walletValuation.totalValue}')
+                ],
+              ),
+              padding: EdgeInsets.all(10),
+            ),
+            if (!isUpdating) Container(
+              child: DropdownSearch<String>(
+                mode: Mode.BOTTOM_SHEET,
+                showSelectedItem: true,
+                items: [ 'Value - ASC', 'Value - DESC', 'Coin Count - ASC', 'Coin Count - DESC' ],
+                label: 'Sort By',
+                hint: 'The crypto currency you want to trade',
+                onChanged: (sortOption) => setSortOption(sortOption),
+                selectedItem: 'Value - DESC',
+              ),
               padding: EdgeInsets.all(10),
             ),
             if (!isUpdating) Expanded(
@@ -157,6 +175,15 @@ class _CoinsScreenState extends State<CoinsScreen> {
     );
   }
 
+  void setSortOption(String sortOption) {
+    setState(() {
+      if (sortOption == 'Value - ASC') walletValuation.sortByValue(false);
+      if (sortOption == 'Value - DESC') walletValuation.sortByValue(true);
+      if (sortOption == 'Coin Count - ASC') walletValuation.sortByCoinCount(false);
+      if (sortOption == 'Coin Count - DESC') walletValuation.sortByCoinCount(true);
+    });
+  }
+
   Future<void> fetchCoins() async {
     setState(() {
       isUpdating = true;
@@ -175,11 +202,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
 //          walletValuation = WalletValuation(data['totalValue'], data['values'].map((Map<String, dynamic> v) =>
 //            CoinsValuation(v['coin'], v['coinCount'], v['isNonMainstream'], v['usdValue'], CoinIndividualValues.fromJson(v['individualValues']), CoinTotalValues.fromJson(v['totalValues'])))
 //          );
-          walletValuation = WalletValuation.fromJson(data);
-          print(walletValuation.values.length);
-          print(walletValuation.values[0]);
-          print(walletValuation.values[0]['coinCount']);
-          print(walletValuation.values[0]['coin']);
+          walletValuation = WalletValuation.fromJson(data).sortByValue(true);
         });
       }
 

@@ -22,7 +22,7 @@ class WalletValuation {
   }
 
   WalletValuation sortByCoinCount(bool desc) {
-    values.sort((a, b) => double.parse(a['coinCount']).compareTo(double.parse(b['coinCount'])));
+    values.sort((a, b) => a['coinCount'].compareTo(b['coinCount']));
     if (desc) values = values.reversed.toList();
     return this;
   }
