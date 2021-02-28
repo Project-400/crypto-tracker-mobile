@@ -21,43 +21,6 @@ class PriceChartsScreen extends StatefulWidget {
 }
 
 class _PriceChartsScreenState extends State<PriceChartsScreen> {
-
-  List<KLineEntity> datas = [
-    KLineEntity.fromJson({
-      'open': 10,
-      'close': 18,
-      'high': 23,
-      'low': 8,
-      'vol': 23,
-      'amount': 23,
-      'time': DateTime.now().millisecondsSinceEpoch,
-//      'ratio': 23,
-//      'change': 23,
-    }),
-    KLineEntity.fromJson({
-      'open': 18,
-      'close': 17,
-      'high': 21,
-      'low': 15,
-      'vol': 15,
-      'amount': 23,
-      'time': DateTime.now().millisecondsSinceEpoch,
-//      'ratio': 23,
-//      'change': 23,
-    }),
-    KLineEntity.fromJson({
-      'open': 17,
-      'close': 21,
-      'high': 21,
-      'low': 16,
-      'vol': 8,
-      'amount': 23,
-      'time': DateTime.now().millisecondsSinceEpoch,
-//      'ratio': 23,
-//      'change': 23,
-    }),
-  ];
-
   bool isUpdating = false;
   String selectedCurrencyPair = 'BTCUSDT';
   String subscribedPair;
@@ -75,15 +38,11 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   void initState() {
     super.initState();
 
-    getKlineData(selectedCurrencyPair, selectedInterval);
-
     widget.channel.stream.listen((received) {
       _receivePriceUpdate(received);
     });
 
-    Future.delayed(const Duration(seconds: 3), () => {
-      _subscribeToSymbolPrice(selectedCurrencyPair, selectedInterval)
-    });
+    getKlineData(selectedCurrencyPair, selectedInterval);
   }
 
   @override
@@ -266,14 +225,14 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      print('*********');
-      print(data);
-      print('*********');
-
       final klinePoints = (data as List<dynamic>).map((d) => BinanceKlinePoint.fromBinanceHttp(d).toK_Line()).toList();
 
       setState(() {
         klines = klinePoints.toList();
+      });
+
+      Future.delayed(const Duration(seconds: 1), () => {
+        _subscribeToSymbolPrice(selectedCurrencyPair, selectedInterval)
       });
     } else {
       throw Exception('Failed to gather kline data');
@@ -285,28 +244,20 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   void _receivePriceUpdate(String message) {
-    print(message);
+    try {
+      Map<String, dynamic> data = json.decode(message);
+      if (data['e'] != null && data['e'] == 'kline' && data['s'] != null && data['s'] == selectedCurrencyPair) {
+        KLineEntity kline = BinanceKlinePoint.fromBinanceWs(data['k']).toK_Line();
 
-    setState(() {
-      try {
-        Map<String, dynamic> data = json.decode(message);
-        print(data);
-
-        if (data['e'] != null && data['e'] == 'kline' && data['s'] != null && data['s'] == selectedCurrencyPair) {
-          print('LOOKS OK');
-          KLineEntity kline = BinanceKlinePoint.fromBinanceWs(data['k']).toK_Line();
-          print('KLINE ****');
-          print(kline);
-
-          KLineEntity lastKline = klines.last;
-          if (kline.time == lastKline.time) klines.last = kline;
+        setState(() {
+          if (kline.time == klines.last.time) klines.last = kline;
           else klines.add(kline);
-        }
-      } catch (e) {
-        print(e);
-        print('Websocket message is not in JSON format');
+        });
       }
-    });
+    } catch (e) {
+      print(e);
+      print('Websocket message is not in JSON format');
+    }
   }
 
   void _subscribeToSymbolPrice(String symbol, String interval) {
@@ -314,9 +265,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     widget.channel.sink.add('{ "method": "SUBSCRIBE", "params": [ "${symbol.toLowerCase()}@kline_$interval" ], "id": 1 }');
     if (subscribedPair != null) {
       print('UNSUB from ${selectedCurrencyPair.toLowerCase()}@kline_$subscribedInterval');
-      widget.channel.sink.add(
-          '{ "method": "UNSUBSCRIBE", "params": [ "${selectedCurrencyPair
-              .toLowerCase()}@kline_$subscribedInterval" ], "id": 1 }');
+      widget.channel.sink.add('{ "method": "UNSUBSCRIBE", "params": [ "${selectedCurrencyPair.toLowerCase()}@kline_$subscribedInterval" ], "id": 1 }');
     }
     setState(() {
       subscribedPair = symbol;
