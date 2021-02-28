@@ -1,15 +1,17 @@
 import 'dart:convert';
 
+import 'package:crypto_tracker/models/coins-valuation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto_tracker/models/coin.dart';
+import '../models/wallet-valuation.dart';
 
 class CoinsScreen extends StatefulWidget {
   CoinsScreen({Key key, this.title}) : super(key: key);
 
   final String title;
-  final List<Coin> coins = [];
+//  final List<Coin> coins = [];
 
   @override
   _CoinsScreenState createState() => _CoinsScreenState();
@@ -18,6 +20,7 @@ class CoinsScreen extends StatefulWidget {
 class _CoinsScreenState extends State<CoinsScreen> {
 
   bool isUpdating = false;
+  WalletValuation walletValuation;
 
   @override
   void initState() {
@@ -56,7 +59,8 @@ class _CoinsScreenState extends State<CoinsScreen> {
               ),
             ),
             if (!isUpdating) Container(
-              child: Text('${widget.coins.length} Currencies'),
+//              child: Text('${widget.coins.length} Currencies'),
+              child: Text('${walletValuation.values.length} Currencies'),
               padding: EdgeInsets.all(10),
             ),
             if (!isUpdating) Expanded(
@@ -64,9 +68,11 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 padding: EdgeInsets.all(10),
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
-                itemCount: widget.coins != null ? widget.coins.length : 0,
+                itemCount: walletValuation.values != null ? walletValuation.values.length : 0,
                 itemBuilder: (BuildContext context, int index) {
-                  final Coin coin = widget.coins[index];
+//                  final Coin coin = widget.coins[index];
+                  final coinsValuation = walletValuation.values[index];
+                  print(coinsValuation['coin']);
 
                   return InkWell(
                     child: Container(
@@ -87,29 +93,56 @@ class _CoinsScreenState extends State<CoinsScreen> {
                               bottomRight: Radius.circular(4)
                           )
                       ),
-                      child: Center(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Container(
-                              child: Text(
-                                coin.coin,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                    coinsValuation['coin'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Text(
+                                  coinsValuation['coinCount'].toStringAsFixed(8),
+                                  style: TextStyle(
+                                      fontSize: 16
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              coin.free.toStringAsFixed(6),
-                              style: TextStyle(
-                                  fontSize: 16
-                              ),
+                          ),
+                          Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16
+                                    ),
+                                  ),
+                                ),
+//                                Text(
+//                                  coinsValuation['coinCount'].toStringAsFixed(6),
+//                                  style: TextStyle(
+//                                      fontSize: 16
+//                                  ),
+//                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        ],
+                      )
                     ),
                   );
                 },
@@ -129,14 +162,30 @@ class _CoinsScreenState extends State<CoinsScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:15002/coins');
+    final response = await http.get('http://localhost:15002/valuation/all');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      final coins = (data['coins'] as List).map((c) => Coin.fromJson(c));
+      print(data);
+      print('----------');
+
+      if (data['success']) {
+        setState(() {
+//          walletValuation = WalletValuation(data['totalValue'], data['values'].map((Map<String, dynamic> v) =>
+//            CoinsValuation(v['coin'], v['coinCount'], v['isNonMainstream'], v['usdValue'], CoinIndividualValues.fromJson(v['individualValues']), CoinTotalValues.fromJson(v['totalValues'])))
+//          );
+          walletValuation = WalletValuation.fromJson(data);
+          print(walletValuation.values.length);
+          print(walletValuation.values[0]);
+          print(walletValuation.values[0]['coinCount']);
+          print(walletValuation.values[0]['coin']);
+        });
+      }
+
+//      WalletValuation walletValuation = (data['values'] as List).map((c) => Coin.fromJson(c));
       setState(() {
-        widget.coins.addAll(coins);
+//        widget.coins.addAll(coins);
         isUpdating = false;
       });
     } else {
