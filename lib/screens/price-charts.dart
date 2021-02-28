@@ -56,13 +56,14 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   bool isUpdating = false;
   String selectedCurrencyPair;
+  String selectedInterval = '1m';
 
   List<KLineEntity> klines = [];
   bool showLoading = true;
   MainState _mainState = MainState.NONE;
   SecondaryState _secondaryState = SecondaryState.NONE;
   bool isLine = false;
-  bool isChinese = true;
+  bool isChinese = false;
 
   @override
   void initState() {
@@ -73,6 +74,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   Widget build(BuildContext context) {
     return
       WillPopScope(
+        onWillPop: () => Future.value(false),
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
@@ -83,11 +85,25 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text('Price Charts'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          child: intervalButton('1m', () => setInterval('1m'))
+                      ),
+                      Expanded(
+                          child: intervalButton('1h', () => setInterval('1h'))
+                      ),
+                      Expanded(
+                          child: intervalButton('1d', () => setInterval('1d'))
+                      ),
+                    ],
+                  ),
                   Container(
                     child: DropdownSearch<String>(
                       mode: Mode.BOTTOM_SHEET,
                       showSelectedItem: true,
-                      items: ['ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+                      items: ['ADAUSDT', 'AAVEUSDT', 'ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
                       label: 'Currency Pair',
                       hint: 'The crypto currency you want to trade',
                       onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
@@ -102,8 +118,8 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                       isLine: isLine,// Decide whether it is k-line or time-sharing
                       mainState: _mainState,// Decide what the main view shows
                       secondaryState: _secondaryState,// Decide what the sub view shows
-                      fixedLength: 2,// Displayed decimal precision
-                      timeFormat: TimeFormat.YEAR_MONTH_DAY,
+                      fixedLength: 8,// Displayed decimal precision
+                      timeFormat: TimeFormat.YEAR_MONTH_DAY_WITH_HOUR ,
                       onLoadMore: (bool a) {
                         print('end');
                       },// Called when the data scrolls to the end. When a is true, it means the user is pulled to the end of the right side of the data. When a
@@ -123,22 +139,48 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
       );
   }
 
+  Widget intervalButton(String text, Function onPressed) {
+    return Container(
+      child: RaisedButton(
+        child: Text(
+          text,
+          style: TextStyle(
+              fontSize: 16
+          ),
+        ),
+        onPressed: onPressed,
+        color: Colors.lightBlue,
+        textColor: Colors.white,
+      ),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    );
+  }
+
   void setSelectedCurrencyPair(String pair) {
     setState(() {
       selectedCurrencyPair = pair;
 
-      getKlineData(selectedCurrencyPair);
+      getKlineData(selectedCurrencyPair, selectedInterval);
     });
   }
 
-  Future<http.Response> getKlineData(String pair) async {
+  void setInterval(String interval) {
+    setState(() {
+      selectedInterval = interval;
+
+      getKlineData(selectedCurrencyPair, selectedInterval);
+    });
+  }
+
+  Future<http.Response> getKlineData(String pair, String interval) async {
     setState(() {
       isUpdating = true;
     });
 
     print('Sending request to get kline data.');
 
-    final response = await http.get('https://api.binance.com/api/v3/klines?symbol=$pair&interval=1m');
+    final response = await http.get('https://api.binance.com/api/v3/klines?symbol=$pair&interval=$interval');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
