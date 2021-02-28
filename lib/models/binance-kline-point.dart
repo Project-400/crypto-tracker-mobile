@@ -30,7 +30,7 @@ class BinanceKlinePoint {
       this.takerBuyQuoteAssetVolume,
   );
 
-  BinanceKlinePoint.fromJson(List<dynamic> values):
+  BinanceKlinePoint.fromBinanceHttp(List<dynamic> values):
         openPrice = values[1],
         closePrice = values[4],
         highPrice = values[2],
@@ -42,6 +42,19 @@ class BinanceKlinePoint {
         numOfTrades = values[8],
         openTime = values[0],
         closeTime = values[6];
+
+  BinanceKlinePoint.fromBinanceWs(Map<String, dynamic> values):
+        openPrice = values['o'],
+        closePrice = values['c'],
+        highPrice = values['h'],
+        lowPrice = values['l'],
+        volume = values['v'],
+        quoteAssetVolume = values['q'],
+        takerBuyBaseAssetVolume = values['V'],
+        takerBuyQuoteAssetVolume = values['Q'],
+        numOfTrades = values['n'],
+        openTime = values['t'],
+        closeTime = values['T'];
 
   KLineEntity toK_Line() {
     return KLineEntity.fromJson({
