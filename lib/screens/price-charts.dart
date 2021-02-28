@@ -27,6 +27,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   String subscribedInterval;
   String selectedInterval = '1m';
   bool isLine = false;
+  List<String> symbolList = [];
 
   List<KLineEntity> klines = [];
   bool showLoading = true;
@@ -43,6 +44,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     });
 
     getKlineData(selectedCurrencyPair, selectedInterval);
+    getSymbolList();
   }
 
   @override
@@ -63,7 +65,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                 child: DropdownSearch<String>(
                   mode: Mode.BOTTOM_SHEET,
                   showSelectedItem: true,
-                  items: ['ADAUSDT', 'AAVEUSDT', 'ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+                  items: symbolList,
                   label: 'Currency Pair',
                   hint: 'The crypto currency you want to trade',
                   onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
@@ -209,6 +211,23 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
 //      getKlineData(selectedCurrencyPair, selectedInterval);
     });
+  }
+
+  Future<http.Response> getSymbolList() async {
+    print('Sending request to get list of symbols.');
+
+    final response = await http.get('http://localhost:15003/exchange-info/valid-symbols');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print(data);
+
+      setState(() {
+        if (data['symbols'] != null) symbolList = data['symbols'].cast<String>();
+      });
+    } else {
+      throw Exception('Failed to gather symbol list');
+    }
   }
 
   Future<http.Response> getKlineData(String pair, String interval) async {
