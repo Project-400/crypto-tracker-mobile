@@ -60,11 +60,14 @@ PODS:
     - plugin_scaffold
   - plugin_scaffold (0.0.1):
     - Flutter
+  - shared_preferences (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_cognito_plugin (from `.symlinks/plugins/flutter_cognito_plugin/ios`)
   - plugin_scaffold (from `.symlinks/plugins/plugin_scaffold/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
 
 SPEC REPOS:
   trunk:
@@ -89,6 +92,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_cognito_plugin/ios"
   plugin_scaffold:
     :path: ".symlinks/plugins/plugin_scaffold/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
 
 SPEC CHECKSUMS:
   AWSAuth: 8be69810a13a6fe6aadb672d24d9e664bf728d61
@@ -107,6 +112,7 @@ SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_cognito_plugin: 1b7f93b023433f702c8c5f953aea379af363fc5b
   plugin_scaffold: f83b8103defd141436d8ee29ba4a3e1b5230fea1
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
 
 PODFILE CHECKSUM: a75497545d4391e2d394c3668e20cfb1c2bbd4aa
 

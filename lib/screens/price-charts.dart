@@ -4,6 +4,7 @@ import 'package:crypto_tracker/models/binance-kline-point.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trading_chart/entity/k_line_entity.dart';
 import 'package:trading_chart/k_chart_widget.dart';
 import 'package:http/http.dart' as http;
@@ -210,16 +211,46 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   void setChartType(bool isLine) {
-    print('Set chart type: $isLine');
     setState(() {
-//      klines = [];
       this.isLine = isLine;
-
-//      getKlineData(selectedCurrencyPair, selectedInterval);
     });
   }
 
+  Future<bool> getStoredPairsList() async {
+    print('Getting saved pairs');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String allPairs = prefs.getString('allSymbolPairsList');
+
+    if (allPairs != null) {
+      print('allPairs');
+      print(allPairs);
+      List<String> pairs = json.decode(allPairs).cast<String>();
+      print('pairsList');
+      print(pairs);
+
+      setState(() {
+        symbolList = pairs;
+      });
+
+      return true;
+    }
+
+    return false;
+  }
+
+  void setStoredPairsList(List<String> pairs) async {
+    print('Saving Pairs List');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('allSymbolPairsList', json.encode(pairs));
+  }
+
   Future<http.Response> getSymbolList() async {
+    bool isPairsSet = await getStoredPairsList();
+    print('isPairsSet');
+    print(isPairsSet);
+    if (isPairsSet) return null;
+
     print('Sending request to get list of symbols.');
 
     final response = await http.get('http://localhost:15003/exchange-info/valid-symbols');
@@ -230,6 +261,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
       setState(() {
         if (data['symbols'] != null) symbolList = data['symbols'].cast<String>();
+        setStoredPairsList(symbolList);
       });
     } else {
       throw Exception('Failed to gather symbol list');
