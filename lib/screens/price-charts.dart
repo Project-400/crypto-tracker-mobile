@@ -217,17 +217,11 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   Future<bool> getStoredPairsList() async {
-    print('Getting saved pairs');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     String allPairs = prefs.getString('allSymbolPairsList');
 
     if (allPairs != null) {
-      print('allPairs');
-      print(allPairs);
       List<String> pairs = json.decode(allPairs).cast<String>();
-      print('pairsList');
-      print(pairs);
 
       setState(() {
         symbolList = pairs;
@@ -240,24 +234,17 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   }
 
   void setStoredPairsList(List<String> pairs) async {
-    print('Saving Pairs List');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('allSymbolPairsList', json.encode(pairs));
   }
 
   Future<http.Response> getSymbolList() async {
-    bool isPairsSet = await getStoredPairsList();
-    print('isPairsSet');
-    print(isPairsSet);
-    if (isPairsSet) return null;
-
-    print('Sending request to get list of symbols.');
+    await getStoredPairsList(); // Continue to request symbols in case a change has been made since last local storage save
 
     final response = await http.get('http://localhost:15003/exchange-info/valid-symbols');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print(data);
 
       setState(() {
         if (data['symbols'] != null) symbolList = data['symbols'].cast<String>();
@@ -274,8 +261,6 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     setState(() {
       isUpdating = true;
     });
-
-    print('Sending request to get kline data.');
 
     final response = await http.get('https://api.binance.com/api/v3/klines?symbol=$pair&interval=$interval');
 
@@ -303,7 +288,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
   void _receivePriceUpdate(String message) {
     try {
       Map<String, dynamic> data = json.decode(message);
-      print(data);
+
       if (data['e'] != null && data['e'] == 'kline' && data['s'] != null && data['s'] == selectedCurrencyPair && data['k']['i'] == selectedInterval) {
         KLineEntity kline = BinanceKlinePoint.fromBinanceWs(data['k']).toK_Line();
 
