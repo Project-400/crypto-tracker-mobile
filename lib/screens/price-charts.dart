@@ -91,6 +91,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
                       fixedLength: 8,// Displayed decimal precision
                       timeFormat: TimeFormat.YEAR_MONTH_DAY_WITH_HOUR ,
                       onLoadMore: (bool a) {
+                        print(a); // a = true is the end on the right, a = false is the end on the left
                         print('end');
                       },// Called when the data scrolls to the end. When a is true, it means the user is pulled to the end of the right side of the data. When a
                       // is false, it means the user is pulled to the end of the left side of the data.
@@ -218,13 +219,13 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   Future<bool> getStoredPairsList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String allPairs = prefs.getString('allSymbolPairsList');
+    String allSymbols = prefs.getString('allSymbols');
 
-    if (allPairs != null) {
-      List<String> pairs = json.decode(allPairs).cast<String>();
+    if (allSymbols != null) {
+      List<String> symbols = json.decode(allSymbols).cast<String>();
 
       setState(() {
-        symbolList = pairs;
+        symbolList = symbols;
       });
 
       return true;
@@ -233,12 +234,12 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     return false;
   }
 
-  void setStoredPairsList(List<String> pairs) async {
+  void setStoredPairsList(List<String> symbols) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('allSymbolPairsList', json.encode(pairs));
+    prefs.setString('allSymbols', json.encode(symbols));
   }
 
-  Future<http.Response> getSymbolList() async {
+  Future<void> getSymbolList() async {
     await getStoredPairsList(); // Continue to request symbols in case a change has been made since last local storage save
 
     final response = await http.get('http://localhost:15003/exchange-info/valid-symbols');
@@ -255,7 +256,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
     }
   }
 
-  Future<http.Response> getKlineData(String pair, String interval) async {
+  Future<void> getKlineData(String pair, String interval) async {
     if (selectedCurrencyPair == null) return null;
 
     setState(() {

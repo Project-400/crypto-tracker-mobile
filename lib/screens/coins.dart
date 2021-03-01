@@ -1,12 +1,11 @@
 import 'dart:convert';
-
-import 'package:crypto_tracker/models/coins-valuation.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto_tracker/models/coin.dart';
 import '../models/wallet-valuation.dart';
+import 'package:crypto_tracker/screens/price-charts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CoinsScreen extends StatefulWidget {
   CoinsScreen({Key key, this.title}) : super(key: key);
@@ -22,11 +21,13 @@ class _CoinsScreenState extends State<CoinsScreen> {
 
   bool isUpdating = false;
   WalletValuation walletValuation;
+  Map<String, dynamic> symbolPairs;
 
   @override
   void initState() {
     super.initState();
     fetchCoins();
+    fetchSymbolPairs();
   }
 
   @override
@@ -93,6 +94,9 @@ class _CoinsScreenState extends State<CoinsScreen> {
                   print(coinsValuation['coin']);
 
                   return InkWell(
+                    onTap: () => {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PriceChartsScreen(title: 'Bot Finished', symbol: '${coinsValuation['coin']}USDT')))
+                    },
                     child: Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -217,4 +221,60 @@ class _CoinsScreenState extends State<CoinsScreen> {
       throw Exception('Failed to fetch Coins');
     }
   }
+
+  Future<void> fetchSymbolPairs() async {
+    print('FETCH SYMBOL PAIRS');
+
+    await getStoredSymbolPairs(); // Continue to request symbols in case a change has been made since last local storage save
+
+    final response = await http.get('http://localhost:15005/symbol-pairs');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+//      print('SYMBOL PAIRS');
+      print(data);
+      print('----------');
+
+      if (data['success']) {
+        setState(() {
+          symbolPairs = data['pairs'];
+//          setStoredSymbolPairs(symbolPairs);
+        });
+      }
+    } else {
+      throw Exception('Failed to fetch Symbol Pairs');
+    }
+  }
+
+  Future<bool> getStoredSymbolPairs() async {
+    print('GET STORED SYMBOL PAIRS');
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String allPairs = prefs.getString('allSymbolPairs');
+
+    if (allPairs != null) {
+      print('GOT STORED SYMBOL PAIRS');
+
+      Map<String, dynamic> pairs = json.decode(allPairs);
+
+      setState(() {
+        symbolPairs = pairs;
+      });
+
+      return true;
+    }
+    print('NO STORED SYMBOL PAIRS');
+
+
+    return false;
+  }
+
+  void setStoredSymbolPairs(Map<String, dynamic> pairs) async {
+    print('SET STORED SYMBOL PAIRS');
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('allSymbolPairs', json.encode(pairs));
+  }
+
 }
