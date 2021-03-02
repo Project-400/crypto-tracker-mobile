@@ -193,13 +193,27 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return SimpleDialog(
-                    title: const Text('Currency Pair'),
+                    title: Text(
+                        'Currency Pair',
+                      textAlign: TextAlign.center,
+                    ),
                     children: pairs.map((pair) => Expanded(
                         child: SimpleDialogOption(
                         onPressed: () {
                           Navigator.pop(context, '$coin$pair');
                         },
-                        child: Text('$coin$pair'),
+                        child: Container(
+                          child: Text(
+                            '$coin$pair',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white
+                            ),
+                          ),
+                          color: Color(0xff888888),
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          alignment: Alignment.center,
+                        ),
                       )
                     )).toList()
                   );
