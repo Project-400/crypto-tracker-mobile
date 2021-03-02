@@ -194,8 +194,8 @@ class _CoinsScreenState extends State<CoinsScreen> {
                     title: const Text('Currency Pair'),
                     children: pairs.map((pair) => Expanded(
                         child: SimpleDialogOption(
-                        onPressed: () => {
-                          Navigator.pop(context, '$coin$pair')
+                        onPressed: () {
+                          Navigator.pop(context, '$coin$pair');
                         },
                         child: Text('$coin$pair'),
                       )
@@ -204,7 +204,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 }
               );
 
-              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+              if (selectedPair != null) Navigator.push(context, MaterialPageRoute(builder: (context) =>
                   PriceChartsScreen(title: 'Price Charts', symbol: selectedPair))
               );
             }, // button pressed
