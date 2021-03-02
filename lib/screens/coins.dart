@@ -89,82 +89,84 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 scrollDirection: Axis.vertical,
                 itemCount: walletValuation.values != null ? walletValuation.values.length : 0,
                 itemBuilder: (BuildContext context, int index) {
-//                  final Coin coin = widget.coins[index];
                   final coinsValuation = walletValuation.values[index];
                   String coin = coinsValuation['coin'];
                   List<String> pairs = symbolPairs[coinsValuation['coin']].cast<String>();
 
-                  return InkWell(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 0.2,
-                              blurRadius: 0.5,
-                              offset: Offset(0, 0.5), // changes position of shadow
-                            ),
-                          ],
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4),
-                              bottomLeft: Radius.circular(4),
-                              bottomRight: Radius.circular(4)
-                          )
-                      ),
-                      child: Column(
-                        children: [
-                          Center(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                    coin,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  coinsValuation['coinCount'].toStringAsFixed(8),
+                  return Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 0.2,
+                            blurRadius: 0.5,
+                            offset: Offset(0, 0.5), // changes position of shadow
+                          ),
+                        ],
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                            bottomLeft: Radius.circular(4),
+                            bottomRight: Radius.circular(4)
+                        )
+                    ),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  coin,
                                   style: TextStyle(
+                                      fontWeight: FontWeight.bold,
                                       fontSize: 16
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              Text(
+                                coinsValuation['coinCount'].toStringAsFixed(8),
+                                style: TextStyle(
+                                    fontSize: 16
+                                ),
+                              ),
+                            ],
                           ),
-                          Center(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16
-                                    ),
+                        ),
+                        Center(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                              coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16
                                   ),
                                 ),
+                              ),
 //                                Text(
 //                                  coinsValuation['coinCount'].toStringAsFixed(6),
 //                                  style: TextStyle(
 //                                      fontSize: 16
 //                                  ),
 //                                ),
-                              ],
-                            ),
+                            ],
                           ),
-                          symbolPairButton(coin, pairs)
-                        ],
-                      )
-                    ),
+                        ),
+                        Column(
+                          children: [
+                            symbolPairButton(coin, pairs)
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.end,
+                        )
+                      ],
+                    )
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(
@@ -208,12 +210,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                   PriceChartsScreen(title: 'Price Charts', symbol: selectedPair))
               );
             }, // button pressed
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(Icons.show_chart_sharp, size: 30), // icon
-              ],
-            ),
+            child: Icon(Icons.show_chart_sharp, size: 30), // icon
           ),
         ),
       ),

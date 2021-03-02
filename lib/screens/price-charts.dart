@@ -195,6 +195,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   void setSelectedCurrencyPair(String pair) {
     setState(() {
+      klines = [];
       lastCurrencyPair = selectedCurrencyPair;
       selectedCurrencyPair = pair;
 
