@@ -37,14 +37,51 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
               ),
-              navigationButton(context, 'Price Charts', '/price-charts'),
-              navigationButton(context, 'My Assets', '/coins'),
-              navigationButton(context, 'Best Performers', '/best-performers'),
+//              navigationButton(context, 'Price Charts', '/price-charts'),
+//              navigationButton(context, 'My Assets', '/coins'),
+//              navigationButton(context, 'Best Performers', '/best-performers'),
               navigationButton(context, 'Deploy Bot', '/subscribe'),
 //              navigationButtonWithScreen(context, 'Skip to Finished', MaterialPageRoute(builder: (context) => BotFinishedScreen(title: 'Bot Finished', botId: '32b6ed51-b267-4d22-84c7-9b794028c21b'))),
             ],
           ),
         ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.attach_money),
+                label: 'My Assets',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.show_chart_sharp),
+                label: 'Price Charts',
+              ),
+//              BottomNavigationBarItem(
+//                icon: Icon(Icons.queue_outlined),
+//                label: 'Bots',
+//              ),
+            ],
+            currentIndex: 0,
+            selectedItemColor: Colors.amber[800],
+            onTap: (index) {
+              String url = '/';
+              switch (index) {
+                case 0:
+                  url = '/';
+                  break;
+                case 1:
+                  url = '/coins';
+                  break;
+                case 2:
+                  url = '/price-charts';
+                  break;
+              }
+              Navigator.pushNamed(context, url);
+            },
+          )
       ),
     );
   }
