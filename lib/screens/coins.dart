@@ -91,12 +91,10 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 itemBuilder: (BuildContext context, int index) {
 //                  final Coin coin = widget.coins[index];
                   final coinsValuation = walletValuation.values[index];
-                  print(coinsValuation['coin']);
+                  String coin = coinsValuation['coin'];
+                  List<String> pairs = symbolPairs[coinsValuation['coin']].cast<String>();
 
                   return InkWell(
-                    onTap: () => {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => PriceChartsScreen(title: 'Bot Finished', symbol: '${coinsValuation['coin']}USDT')))
-                    },
                     child: Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -124,7 +122,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                               children: <Widget>[
                                 Container(
                                   child: Text(
-                                    coinsValuation['coin'],
+                                    coin,
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16
@@ -163,6 +161,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                               ],
                             ),
                           ),
+                          symbolPairButton(coin, pairs)
                         ],
                       )
                     ),
@@ -174,6 +173,48 @@ class _CoinsScreenState extends State<CoinsScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget symbolPairButton(String coin, List<String> pairs) {
+    return SizedBox.fromSize(
+      size: Size(40, 40), // button width and height
+      child: ClipOval(
+        child: Material(
+          color: Colors.orange, // button color
+          child: InkWell(
+            splashColor: Colors.green, // splash color
+            onTap: () async {
+              final selectedPair = await showDialog<String>(
+                context: context,
+                builder: (BuildContext context) {
+                  return SimpleDialog(
+                    title: const Text('Currency Pair'),
+                    children: pairs.map((pair) => Expanded(
+                        child: SimpleDialogOption(
+                        onPressed: () => {
+                          Navigator.pop(context, '$coin$pair')
+                        },
+                        child: Text('$coin$pair'),
+                      )
+                    )).toList()
+                  );
+                }
+              );
+
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                  PriceChartsScreen(title: 'Price Charts', symbol: selectedPair))
+              );
+            }, // button pressed
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.show_chart_sharp, size: 30), // icon
+              ],
+            ),
+          ),
         ),
       ),
     );
