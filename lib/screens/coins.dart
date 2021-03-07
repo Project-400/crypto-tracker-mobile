@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,6 +38,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.COINS_SCREEN),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

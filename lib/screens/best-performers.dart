@@ -131,7 +131,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:15003/trends/best-performers');
+    final response = await http.get('http://localhost:15004/trends/best-performers');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

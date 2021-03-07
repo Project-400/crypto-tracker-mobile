@@ -1,3 +1,5 @@
+import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/screens/bot-finished.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text(widget.title),
           automaticallyImplyLeading: false,
         ),
+        bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.HOME_SCREEN),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -45,43 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.attach_money),
-                label: 'My Assets',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.show_chart_sharp),
-                label: 'Price Charts',
-              ),
-//              BottomNavigationBarItem(
-//                icon: Icon(Icons.queue_outlined),
-//                label: 'Bots',
-//              ),
-            ],
-            currentIndex: 0,
-            selectedItemColor: Colors.amber[800],
-            onTap: (index) {
-              String url = '/';
-              switch (index) {
-                case 0:
-                  url = '/';
-                  break;
-                case 1:
-                  url = '/coins';
-                  break;
-                case 2:
-                  url = '/price-charts';
-                  break;
-              }
-              Navigator.pushNamed(context, url);
-            },
-          )
       ),
     );
   }

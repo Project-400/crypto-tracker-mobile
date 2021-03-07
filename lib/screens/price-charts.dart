@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/binance-kline-point.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,7 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
           appBar: AppBar(
             title: Text(widget.title),
           ),
+          bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.PRICE_CHARTS),
           body:
           ListView(
             children: <Widget>[
