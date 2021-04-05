@@ -25,7 +25,6 @@ class CryptoTrackerApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<CryptoTrackerApp> {
-  bool _amplifyConfigured = false;
 
   @override
   State<StatefulWidget> initState() {
@@ -34,7 +33,7 @@ class _MyAppState extends State<CryptoTrackerApp> {
   }
 
   void _configureAmplify() async {
-    if (mounted) return; // Avoid reconfiguring Amplify or error will occur
+    if (!mounted) return;
 
     Amplify.addPlugin(AmplifyAuthCognito());
 
@@ -42,14 +41,9 @@ class _MyAppState extends State<CryptoTrackerApp> {
       await Amplify.configure(amplifyconfig);
       print('Amplify successfully configured');
     } on AmplifyAlreadyConfiguredException {
-      print('Amplify was already configured. Was the app restarted?');
-    }
-    try {
-      this.setState(() {
-        _amplifyConfigured = true;
-      });
-    } catch (e) {
-      print(e);
+      print('Amplify was already configured.');
+    } on AmplifyException {
+      print('Amplify may have already been configured.');
     }
   }
 
