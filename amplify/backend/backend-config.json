@@ -1,1 +1,10 @@
-{}
+{
+	"auth": {
+		"cryptotracker31b5e726": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
+		}
+	}
+}

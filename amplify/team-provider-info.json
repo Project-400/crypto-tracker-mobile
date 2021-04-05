@@ -10,6 +10,11 @@
             "StackName": "amplify-cryptotracker-dev-163737",
             "StackId": "arn:aws:cloudformation:eu-west-1:068475715603:stack/amplify-cryptotracker-dev-163737/db1f1b10-9624-11eb-96e3-0a847aceeafb",
             "AmplifyAppId": "d2771g9a30o4mr"
+        },
+        "categories": {
+            "auth": {
+                "cryptotracker31b5e726": {}
+            }
         }
     }
 }
