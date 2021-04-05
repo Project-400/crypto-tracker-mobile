@@ -1,0 +1,15 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-cryptotracker-dev-163737-authRole",
+            "UnauthRoleArn": "arn:aws:iam::068475715603:role/amplify-cryptotracker-dev-163737-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::068475715603:role/amplify-cryptotracker-dev-163737-authRole",
+            "Region": "eu-west-1",
+            "DeploymentBucketName": "amplify-cryptotracker-dev-163737-deployment",
+            "UnauthRoleName": "amplify-cryptotracker-dev-163737-unauthRole",
+            "StackName": "amplify-cryptotracker-dev-163737",
+            "StackId": "arn:aws:cloudformation:eu-west-1:068475715603:stack/amplify-cryptotracker-dev-163737/db1f1b10-9624-11eb-96e3-0a847aceeafb",
+            "AmplifyAppId": "d2771g9a30o4mr"
+        }
+    }
+}
