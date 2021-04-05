@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:flutter/material.dart';
+
+import 'confirm-email.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key key, this.title}) : super(key: key);
@@ -92,7 +95,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       print(res);
 
       setState(() {
-        isSignedUp = res.isSignUpComplete;
+        isSignedUp = true;
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) =>
+            ConfirmEmailScreen(title: ScreenTitles.CONFIRM_EMAIL_SCREEN, email: emailAddress)
+        ));
       });
     } on AuthException catch (e) {
       print(e.message);

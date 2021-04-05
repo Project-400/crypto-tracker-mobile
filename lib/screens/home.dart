@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 //import 'package:aws_sns_api/sns-2010-03-31.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key key, this.title}) : super(key: key);
+  HomeScreen({Key key, this.title, email}) : super(key: key);
 
   final String title;
 

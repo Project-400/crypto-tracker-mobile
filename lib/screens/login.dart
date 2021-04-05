@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:flutter/material.dart';
+
+import 'home.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
@@ -88,6 +91,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
       setState(() {
         isLoggedIn = res.isSignedIn;
+
+        if (res.isSignedIn) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+              HomeScreen(title: ScreenTitles.HOME_SCREEN)
+          ));
+        }
       });
     } on AuthException catch (e) {
       print(e.message);
