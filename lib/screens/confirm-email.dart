@@ -35,6 +35,7 @@ class _ConfirmEmailScreenState extends State<ConfirmEmailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            if (widget.email != null) Text(widget.email),
             Container(
               child: TextField(
                 decoration: InputDecoration(

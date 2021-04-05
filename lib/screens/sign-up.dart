@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({Key key, this.title}) : super(key: key);
@@ -17,6 +16,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
 
   bool isSigningUp = false;
+  bool isSignedUp = false;
   String emailAddress;
   String password;
 
@@ -90,6 +90,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       print(res);
+
+      setState(() {
+        isSignedUp = res.isSignUpComplete;
+      });
     } on AuthException catch (e) {
       print(e.message);
     }
