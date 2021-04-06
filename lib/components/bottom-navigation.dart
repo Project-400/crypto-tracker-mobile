@@ -21,6 +21,9 @@ class BottomNavBar extends StatelessWidget {
       case ScreenTitles.PRICE_CHARTS:
         currentIndex = 2;
         break;
+      case ScreenTitles.SUBSCRIBE:
+        currentIndex = 3;
+        break;
     }
 
     return BottomNavigationBar(
@@ -37,11 +40,12 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.show_chart_sharp),
           label: ScreenTitles.PRICE_CHARTS,
         ),
-//              BottomNavigationBarItem(
-//                icon: Icon(Icons.queue_outlined),
-//                label: 'Bots',
-//              ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.queue_outlined),
+          label: ScreenTitles.SUBSCRIBE,
+        ),
       ],
+      type: BottomNavigationBarType.fixed,
       currentIndex: currentIndex,
       selectedItemColor: Colors.amber[800],
       onTap: (index) {
@@ -55,6 +59,9 @@ class BottomNavBar extends StatelessWidget {
             break;
           case 2:
             url = NavigationRoutes.PRICE_CHARTS;
+            break;
+          case 3:
+            url = NavigationRoutes.SUBSCRIBE;
             break;
         }
         Navigator.pushNamed(context, url);
