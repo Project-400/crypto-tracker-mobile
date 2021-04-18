@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 checkIfAuthenticated() async {
-//  final session = await Amplify.Auth.fetchAuthSession();
+  final session = await Amplify.Auth.fetchAuthSession();
   await Future.delayed(Duration(seconds: 2));
-  return true;
+//  return true;
+  return session.isSignedIn;
 }
 
 class LandingScreen extends StatefulWidget {
   LandingScreen({Key key, this.title, email}) : super(key: key);
 
   final String title;
-//  bool loggedIn = false;
 
   @override
   _LandingScreenState createState() => _LandingScreenState();
@@ -29,8 +29,6 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     checkIfAuthenticated().then((success) {
-      print('success');
-      print(success);
       if (success) {
         Navigator.pushReplacementNamed(context, '/price-charts');
       } else {

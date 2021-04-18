@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
@@ -22,11 +23,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isSignedUp = false;
   String emailAddress;
   String password;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
