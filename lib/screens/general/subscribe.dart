@@ -72,157 +72,159 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       });
     });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        automaticallyImplyLeading: false,
-        actions: [
-          if (isLoggedIn) Padding(
-            padding: EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: Icon(Icons.logout),
-              onPressed: () => showConfirmLogoutDialog(context),
-            ),
+    return WillPopScope(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            automaticallyImplyLeading: false,
+            actions: [
+              if (isLoggedIn) Padding(
+                padding: EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () => showConfirmLogoutDialog(context),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.SUBSCRIBE),
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            Visibility (
-              child: currencyPairSelector(context),
-              visible: !isBotWorking && !isUpdating,
-            ),
-            if (!isBotWorking && !isUpdating) botButton(
-              'Start Bot',
-              () => selectedCurrencyPair == null || quoteAmount == null ? null : subscribeToBot()
-            ),
-            if (isBotWorking && !isUpdating) Row(
-                children: [
-                  Expanded(
-                    child: botButton(
-                      'Shutdown Bot',
-                      () => unsubscribeToBot()
-                    ),
+          bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.SUBSCRIBE),
+          body: Center(
+              child: ListView(
+                children: <Widget>[
+                  Visibility (
+                    child: currencyPairSelector(context),
+                    visible: !isBotWorking && !isUpdating,
                   ),
-                  Expanded(
-                    child: Container(
-                      decoration: new BoxDecoration(
-                        color: Colors.white,
-//                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 0), // changes position of shadow
-                          ),
-                        ],
+                  if (!isBotWorking && !isUpdating) botButton(
+                      'Start Bot',
+                          () => selectedCurrencyPair == null || quoteAmount == null ? null : subscribeToBot()
+                  ),
+                  if (isBotWorking && !isUpdating) Row(
+                    children: [
+                      Expanded(
+                        child: botButton(
+                            'Shutdown Bot',
+                                () => unsubscribeToBot()
+                        ),
                       ),
-                      child: Row(
+                      Expanded(
+                          child: Container(
+                            decoration: new BoxDecoration(
+                              color: Colors.white,
+//                        shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 0), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Icon(
+                                    Icons.access_time,
+                                  ),
+                                ),
+                                Expanded(
+                                    child: Center(
+                                      child: Text(
+                                          secondsTrading.toString(),
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold
+                                          )
+                                      ),
+                                    )
+                                ),
+                              ],
+//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            ),
+//                      color: Colors.grey,
+                            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                            margin: EdgeInsets.symmetric(horizontal: 10),
+                          )
+                      ),
+                    ],
+//              mainAxisAlignment: MainAxisAlignment.center
+                  ),
+                  if (isBotWorking) Container(
+                      child: Divider(
+                        color: Color(0xffcccccc),
+                        height: 1,
+                        thickness: 1,
+                        indent: 10,
+                        endIndent: 10,
+                      ),
+                      margin: EdgeInsets.only(bottom: 15)
+                  ),
+                  if (isBotWorking) Container(
+                    child: SpinKitPulse(
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                    margin: EdgeInsets.only(bottom: 10),
+                  ),
+                  Visibility (
+                    child: botDetails(context),
+                    visible: isBotWorking,
+                  ),
+                  if (isBotWorking) Container(
+                      child: Divider(
+                        color: Color(0xffcccccc),
+                        height: 1,
+                        thickness: 1,
+                        indent: 10,
+                        endIndent: 10,
+                      ),
+                      margin: EdgeInsets.only(top: 15)
+                  ),
+                  Visibility (
+                    child: botLogs(context),
+                    visible: isBotWorking,
+                  ),
+                  Visibility(
+                    child: Container(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: Icon(
-                              Icons.access_time,
+                          Container(
+                            child: SpinKitWave(
+                              color: Colors.blue,
+                              size: 60,
+                            ),
+                            margin: EdgeInsets.symmetric(vertical: 50),
+                          ),
+                          Text(
+                            'Preparing Bot..',
+                            style: TextStyle(
+                              fontSize: 18,
                             ),
                           ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                  secondsTrading.toString(),
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold
-                                  )
+                          Container(
+                            child: SvgPicture.asset(
+                              'assets/bot.svg',
+                              semanticsLabel: 'Preparing Bot',
+                              placeholderBuilder: (BuildContext context) => Container(
+                                  padding: const EdgeInsets.all(30.0),
+                                  child: const CircularProgressIndicator()
                               ),
-                            )
-                          ),
+                              height: 300,
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
+                          )
                         ],
-//                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                       ),
-//                      color: Colors.grey,
-                      padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                    )
+//                height: 700, // TODO: Temporarily hard coded
+                    ),
+                    visible: isUpdating && !isBotWorking,
                   ),
                 ],
-//              mainAxisAlignment: MainAxisAlignment.center
-            ),
-            if (isBotWorking) Container(
-              child: Divider(
-                color: Color(0xffcccccc),
-                height: 1,
-                thickness: 1,
-                indent: 10,
-                endIndent: 10,
-              ),
-              margin: EdgeInsets.only(bottom: 15)
-            ),
-            if (isBotWorking) Container(
-              child: SpinKitPulse(
-                color: Colors.blue,
-                size: 30,
-              ),
-              margin: EdgeInsets.only(bottom: 10),
-            ),
-            Visibility (
-              child: botDetails(context),
-              visible: isBotWorking,
-            ),
-            if (isBotWorking) Container(
-                child: Divider(
-                  color: Color(0xffcccccc),
-                  height: 1,
-                  thickness: 1,
-                  indent: 10,
-                  endIndent: 10,
-                ),
-                margin: EdgeInsets.only(top: 15)
-            ),
-            Visibility (
-              child: botLogs(context),
-              visible: isBotWorking,
-            ),
-            Visibility(
-              child: Container(
-                child: Column(
-                  children: [
-                    Container(
-                      child: SpinKitWave(
-                        color: Colors.blue,
-                        size: 60,
-                      ),
-                      margin: EdgeInsets.symmetric(vertical: 50),
-                    ),
-                    Text(
-                      'Preparing Bot..',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                    Container(
-                      child: SvgPicture.asset(
-                          'assets/bot.svg',
-                          semanticsLabel: 'Preparing Bot',
-                          placeholderBuilder: (BuildContext context) => Container(
-                            padding: const EdgeInsets.all(30.0),
-                            child: const CircularProgressIndicator()
-                          ),
-                          height: 300,
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
-                    )
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.center,
-                ),
-//                height: 700, // TODO: Temporarily hard coded
-              ),
-              visible: isUpdating && !isBotWorking,
-            ),
-          ],
+              )
+          ),
         )
-      ),
     );
   }
 
