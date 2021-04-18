@@ -12,26 +12,26 @@ class BottomNavBar extends StatelessWidget {
     num currentIndex = 0;
 
     switch(selectedScreen) {
-      case ScreenTitles.HOME_SCREEN:
+//      case ScreenTitles.HOME_SCREEN:
+//        currentIndex = 0;
+//        break;
+      case ScreenTitles.COINS_SCREEN:
         currentIndex = 0;
         break;
-      case ScreenTitles.COINS_SCREEN:
+      case ScreenTitles.PRICE_CHARTS:
         currentIndex = 1;
         break;
-      case ScreenTitles.PRICE_CHARTS:
-        currentIndex = 2;
-        break;
       case ScreenTitles.SUBSCRIBE:
-        currentIndex = 3;
+        currentIndex = 2;
         break;
     }
 
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: ScreenTitles.HOME_SCREEN,
-        ),
+//        BottomNavigationBarItem(
+//          icon: Icon(Icons.home),
+//          label: ScreenTitles.HOME_SCREEN,
+//        ),
         BottomNavigationBarItem(
           icon: Icon(Icons.attach_money),
           label: ScreenTitles.COINS_SCREEN,
@@ -51,16 +51,16 @@ class BottomNavBar extends StatelessWidget {
       onTap: (index) {
         String url = '/';
         switch (index) {
+//          case 0:
+//            url = NavigationRoutes.HOME_SCREEN;
+//            break;
           case 0:
-            url = NavigationRoutes.HOME_SCREEN;
-            break;
-          case 1:
             url = NavigationRoutes.COINS_SCREEN;
             break;
-          case 2:
+          case 1:
             url = NavigationRoutes.PRICE_CHARTS;
             break;
-          case 3:
+          case 2:
             url = NavigationRoutes.SUBSCRIBE;
             break;
         }

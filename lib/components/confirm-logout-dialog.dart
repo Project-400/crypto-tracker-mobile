@@ -1,6 +1,6 @@
 import 'package:amplify_flutter/amplify.dart';
+import 'package:crypto_tracker/constants/navigation-routes.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
-import 'package:crypto_tracker/screens/home.dart';
 import 'package:flutter/material.dart';
 
 showConfirmLogoutDialog(BuildContext context) {
@@ -14,10 +14,8 @@ showConfirmLogoutDialog(BuildContext context) {
     child: Text('Logout'),
     onPressed: () async {
       await Amplify.Auth.signOut();
-
-//      Navigator.push(context, MaterialPageRoute(builder: (context) =>
-//          HomeScreen(title: ScreenTitles.HOME_SCREEN,)
-//      ));
+      Navigator.pop(context);
+      Navigator.pushNamed(context, NavigationRoutes.HOME_SCREEN);
     },
   );
 
