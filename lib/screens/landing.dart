@@ -1,8 +1,13 @@
+import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
 
 checkIfAuthenticated() async {
-  await Future.delayed(Duration(seconds: 5));  // could be a long running task, like a fetch from keychain
-  return true;
+//  await Future.delayed(Duration(seconds: 5));  // could be a long running task, like a fetch from keychain
+  final session = await Amplify.Auth.fetchAuthSession();
+  print(session);
+  print(session.isSignedIn);
+  return session.isSignedIn;
+//  return true;
 }
 
 class LandingScreen extends StatefulWidget {
@@ -26,10 +31,12 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     checkIfAuthenticated().then((success) {
+      print('success');
+      print(success);
       if (success) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/price-charts');
       } else {
-        Navigator.pushReplacementNamed(context, '/login');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     });
 
