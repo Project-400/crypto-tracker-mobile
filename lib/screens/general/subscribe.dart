@@ -7,7 +7,7 @@ import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/enums.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/bot-log.dart';
-import 'package:crypto_tracker/screens/bot-finished.dart';
+import 'package:crypto_tracker/screens/general/bot-finished.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:dropdown_search/dropdown_search.dart';

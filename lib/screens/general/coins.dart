@@ -9,8 +9,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-import '../models/wallet-valuation.dart';
-import 'package:crypto_tracker/screens/price-charts.dart';
+import '../../models/wallet-valuation.dart';
+import 'package:crypto_tracker/screens/general/price-charts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CoinsScreen extends StatefulWidget {

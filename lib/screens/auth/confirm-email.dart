@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
-import 'package:crypto_tracker/screens/login.dart';
+import 'package:crypto_tracker/screens/auth/login.dart';
 import 'package:flutter/material.dart';
 
 class ConfirmEmailScreen extends StatefulWidget {

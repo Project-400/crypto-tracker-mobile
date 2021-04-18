@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
-import 'package:crypto_tracker/screens/price-charts.dart';
+import 'package:crypto_tracker/screens/general/price-charts.dart';
 import 'package:flutter/material.dart';
 import 'package:trading_chart/utils/date_format_util.dart';
 
-import 'home.dart';
+import '../general/home.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title, this.directedEmail}) : super(key: key);

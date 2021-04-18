@@ -1,9 +1,9 @@
 import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
-import 'package:crypto_tracker/screens/login.dart';
-import 'package:crypto_tracker/screens/sign-up.dart';
+import 'package:crypto_tracker/screens/auth/login.dart';
+import 'package:crypto_tracker/screens/auth/sign-up.dart';
 import 'package:flutter/material.dart';
-import '../auth/check-auth.dart';
+import '../../auth/check-auth.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key, this.title, email}) : super(key: key);
