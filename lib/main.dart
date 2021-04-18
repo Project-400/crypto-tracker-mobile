@@ -1,9 +1,12 @@
+import 'package:amplify_api/amplify_api.dart';
 import 'package:crypto_tracker/redux/coins/coins.state.dart';
 import 'package:crypto_tracker/store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 
+import 'auth/auth.dart';
 import 'constants/screen-titles.dart';
 import 'navigation.dart';
 
@@ -36,21 +39,32 @@ class _MyAppState extends State<CryptoTrackerApp> {
     if (!mounted) return;
 
     Amplify.addPlugin(AmplifyAuthCognito());
+    Amplify.addPlugin(AmplifyAPI());
 
     try {
       await Amplify.configure(amplifyconfig);
       print('Amplify successfully configured');
-    } on AmplifyAlreadyConfiguredException {
+    } on AmplifyAlreadyConfiguredException catch (e) {
+      print(1);
+      print(e);
       print('Amplify was already configured.');
-    } on AmplifyException {
+    } on AmplifyException catch (e) {
+      print(2);
+      print(e);
       print('Amplify may have already been configured.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<CoinsState>(
-      store: store,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider2>(
+          create: (_) {
+            return AuthProvider2();
+          },
+        )
+      ],
       child: MaterialApp(
         title: ScreenTitles.HOME_SCREEN,
         theme: ThemeData(
@@ -60,6 +74,19 @@ class _MyAppState extends State<CryptoTrackerApp> {
         routes: AppNavigation.routes,
       ),
     );
+
+
+//    return StoreProvider<CoinsState>(
+//      store: store,
+//      child: MaterialApp(
+//        title: ScreenTitles.HOME_SCREEN,
+//        theme: ThemeData(
+//          primarySwatch: Colors.blue,
+//          visualDensity: VisualDensity.adaptivePlatformDensity,
+//        ),
+//        routes: AppNavigation.routes,
+//      ),
+//    );
   }
 
 }

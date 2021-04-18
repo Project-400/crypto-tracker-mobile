@@ -1,6 +1,7 @@
 class NavigationRoutes {
 
-  static const String HOME_SCREEN = '/';
+  static const String LANDING_SCREEN = '/';
+  static const String HOME_SCREEN = '/home';
   static const String SIGN_UP_SCREEN = '/signup';
   static const String CONFIRM_EMAIL_SCREEN = '/confirm-email';
   static const String LOGIN_SCREEN = '/login';

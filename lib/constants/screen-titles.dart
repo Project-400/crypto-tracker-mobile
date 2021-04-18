@@ -1,6 +1,7 @@
 class ScreenTitles {
 
-  static const String HOME_SCREEN = 'Home';
+  static const String LANDING_SCREEN = 'Crypto Bot';
+  static const String HOME_SCREEN = 'Crypto Bot';
   static const String SIGN_UP_SCREEN = 'Create Your Account';
   static const String CONFIRM_EMAIL_SCREEN = 'Confirm Your Email';
   static const String LOGIN_SCREEN = 'Login';
