@@ -1,13 +1,11 @@
 import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 checkIfAuthenticated() async {
-//  await Future.delayed(Duration(seconds: 5));  // could be a long running task, like a fetch from keychain
-  final session = await Amplify.Auth.fetchAuthSession();
-  print(session);
-  print(session.isSignedIn);
-  return session.isSignedIn;
-//  return true;
+//  final session = await Amplify.Auth.fetchAuthSession();
+  await Future.delayed(Duration(seconds: 2));
+  return true;
 }
 
 class LandingScreen extends StatefulWidget {
@@ -41,7 +39,25 @@ class _LandingScreenState extends State<LandingScreen> {
     });
 
     return Center(
-      child: CircularProgressIndicator(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            child: SvgPicture.asset(
+              'assets/bitcoin.svg',
+              semanticsLabel: 'Preparing Bot',
+              placeholderBuilder: (BuildContext context) => Container(
+                  padding: const EdgeInsets.all(30.0),
+                  child: const CircularProgressIndicator()
+              ),
+              height: 300,
+            ),
+            padding: EdgeInsets.symmetric(vertical: 80, horizontal: 10),
+          ),
+          CircularProgressIndicator()
+        ],
+      ),
     );
   }
 
