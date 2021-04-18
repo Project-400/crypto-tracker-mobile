@@ -47,14 +47,14 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
                           fontSize: 15
                       ),
                     ),
-                    if (tradeData['priceDifference'] >= 0) Text(
+                    if (double.parse(tradeData['priceDifference']) >= 0) Text(
                       'profit:',
                       style: TextStyle(
                           fontSize: 15,
                         fontWeight: FontWeight.bold
                       ),
                     ),
-                    if (tradeData['priceDifference'] < 0) Text(
+                    if (double.parse(tradeData['priceDifference']) < 0) Text(
                       'loss:',
                       style: TextStyle(
                           fontSize: 15,
@@ -104,7 +104,7 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
 //                    ),
                     Row(
                       children: [
-                        if (tradeData['priceDifference'] >= 0) Text(
+                        if (double.parse(tradeData['priceDifference']) >= 0) Text(
                           '+',
                           style: TextStyle(
                               fontSize: 40,
@@ -112,7 +112,7 @@ class _BotFinishedScreenState extends State<BotFinishedScreen> {
                           ),
                         ),
                         Text(
-                          '${tradeData['priceDifference']}',
+                          '${double.parse(tradeData['priceDifference']) * tradeData['staticBaseQty']}',
                           style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold

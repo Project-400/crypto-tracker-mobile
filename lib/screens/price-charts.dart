@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:crypto_tracker/auth/check-auth.dart';
+import 'package:crypto_tracker/components/app-bar.dart';
 import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/binance-kline-point.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -25,6 +28,8 @@ class PriceChartsScreen extends StatefulWidget {
 }
 
 class _PriceChartsScreenState extends State<PriceChartsScreen> {
+  bool isLoggedIn = false;
+
   bool isUpdating = false;
   String lastCurrencyPair;
   String selectedCurrencyPair = 'BTCUSDT';
@@ -56,12 +61,30 @@ class _PriceChartsScreenState extends State<PriceChartsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    checkIfAuthenticated().then((success) {
+      setState(() {
+        isLoggedIn = success;
+      });
+    });
+
     return
       WillPopScope(
 //        onWillPop: selectedCurrencyPair != null ? () => Future.value(false) : null,
         child: Scaffold(
           appBar: AppBar(
-            title: Text(widget.title),
+            title: Text(
+              widget.title,
+            ),
+            automaticallyImplyLeading: false,
+            actions: [
+              if (isLoggedIn) Padding(
+                padding: EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () => showConfirmLogoutDialog(context),
+                ),
+              ),
+            ],
           ),
           bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.PRICE_CHARTS),
           body:

@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:crypto_tracker/auth/check-auth.dart';
+import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/enums.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/bot-log.dart';
 import 'package:crypto_tracker/screens/bot-finished.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +29,11 @@ class SubscribeScreen extends StatefulWidget {
 }
 
 class _SubscribeScreenState extends State<SubscribeScreen> {
+  bool isLoggedIn = false;
 
 //  Timer ticker;
   Timer timer;
+  Timer priceCheckTimer;
   bool isUpdating = false;
   bool isBotWorking = false;
   bool showBotDetails = false;
@@ -37,7 +43,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   double percentageLoss;
   bool repeatedlyTrade = false;
   bool isProfiting = false;
-  double priceDifferenceInUSD = 1.89;
+  double priceDifferenceInUSD = 0;
   Map<String, dynamic> fullResponse;
   Map<String, dynamic> bot;
   Map<String, dynamic> priceInfo;
@@ -47,6 +53,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   List<BotLog> botPrepEvents = [];
   BotState botState = BotState.NONE;
   int secondsTrading = 0;
+  double BTCPrice = 0;
 
   @override
   void initState() {
@@ -59,10 +66,27 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    checkIfAuthenticated().then((success) {
+      setState(() {
+        isLoggedIn = success;
+      });
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        automaticallyImplyLeading: false,
+        actions: [
+          if (isLoggedIn) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => showConfirmLogoutDialog(context),
+            ),
+          ),
+        ],
       ),
+      bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.SUBSCRIBE),
       body: Center(
         child: ListView(
           children: <Widget>[
@@ -84,6 +108,18 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                   ),
                   Expanded(
                     child: Container(
+                      decoration: new BoxDecoration(
+                        color: Colors.white,
+//                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 0), // changes position of shadow
+                          ),
+                        ],
+                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -105,7 +141,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                         ],
 //                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       ),
-                      color: Colors.grey,
+//                      color: Colors.grey,
                       padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                       margin: EdgeInsets.symmetric(horizontal: 10),
                     )
@@ -216,7 +252,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
           child: DropdownSearch<String>(
             mode: Mode.BOTTOM_SHEET,
             showSelectedItem: true,
-            items: ['COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+            items: ['ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
             label: 'Currency Pair',
             hint: 'The crypto currency you want to trade',
             onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
@@ -288,7 +324,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 margin: EdgeInsets.only(left: 10, right: 5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
-                  color: Colors.grey,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 0), // changes position of shadow
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -321,7 +365,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                 margin: EdgeInsets.only(left: 5, right: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
-                  color: Colors.grey,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 0), // changes position of shadow
+                    ),
+                  ],
                 ),
               )
             ),
@@ -330,11 +382,14 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         Center(
           child: Container(
             child: Text(isBotWorking ? 'The bot is currently ${botState.toString().split('.').last}' : ''),
-            margin: EdgeInsets.symmetric(vertical: 10),
+            margin: EdgeInsets.symmetric(vertical: 20),
           )
         ),
         Center(
-          child: Text(isBotWorking ? '1 ${bot['base']} = $currentPrice ${bot['quote']}' : ''),
+          child: Container(
+            child: Text(isBotWorking ? '1 ${bot['base']} = $currentPrice ${bot['quote']}' : ''),
+            margin: EdgeInsets.only(bottom: 10),
+          ),
         ),
 //        Center(
 //          child: Text(isBotWorking ? '$currentPrice' : ''),
@@ -355,14 +410,30 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       child: Container(
         child: Column(
           children: [
+            Container(
+              child: Text(
+                'Profit / Loss',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold
+                ),
+              ),
+              margin: EdgeInsets.only(bottom: 20),
+            ),
             Row(
               children: [
 //                Icon(
 //                  isProfiting ? Icons.arrow_upward : Icons.arrow_downward,
 //                  size: 30,
 //                ),
+                if (tradeData != null && tradeData['percentageDifference'] >= 0) Text('+',
+                  style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold
+                  ),
+                ),
                 Text(
-                  tradeData != null ? '${tradeData['priceDifference']}' : '',
+                  tradeData != null ? '${(double.parse(tradeData['priceDifference']) * tradeData['baseQty']).toStringAsFixed(tradeData['baseAssetPrecision'])} BTC' : '',
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold
@@ -378,9 +449,17 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
                   fontWeight: FontWeight.bold
               ),
             ),
-            Row(
+            if (tradeData != null) Row(
               children: [
-                Text('~ \$$priceDifferenceInUSD')
+                Container(
+                  child: Text(
+                      '~ \$${(BTCPrice * double.parse(tradeData['priceDifference']) * tradeData['baseQty']).toStringAsFixed(4)}',
+                    style: TextStyle(
+                        fontSize: 16,
+                    ),
+                  ),
+                  margin: EdgeInsets.only(top: 20)
+                )
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             ),
@@ -404,7 +483,15 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
-          color: Colors.grey,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 0), // changes position of shadow
+            ),
+          ],
         ),
       ),
     );
@@ -436,17 +523,19 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
 
               return InkWell(
                 child: Container(
+//                  color: Colors.grey,
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 0.2,
-                          blurRadius: 0.5,
-                          offset: Offset(0, 0.5), // changes position of shadow
-                        ),
-                      ],
-                      borderRadius: BorderRadius.all(Radius.circular(4))
+//                      boxShadow: [
+//                        BoxShadow(
+//                          color: Colors.grey.withOpacity(0.3),
+//                          spreadRadius: 0.2,
+//                          blurRadius: 0.5,
+//                          offset: Offset(0, 0.5), // changes position of shadow
+//                        ),
+//                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(4)),
+                    color: Color(0xffdddddd),
                   ),
                   child:
                     Container(
@@ -484,14 +573,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
-  Widget botFinishedDetails(BuildContext context) {
-    return Column(
-      children: [
-        Text('FINISHED --- ')
-      ],
-    );
-  }
-
   void setSelectedCurrencyPair(String pair) {
     setState(() {
       selectedCurrencyPair = pair;
@@ -502,6 +583,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
   void dispose() {
 //    if (ticker != null) ticker.cancel();
     if (timer != null) timer.cancel();
+    if (priceCheckTimer != null) priceCheckTimer.cancel();
     widget.channel.sink.close();
     super.dispose();
   }
@@ -518,6 +600,12 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       setState(() {
         secondsTrading = secondsTrading + 1;
       });
+    });
+  }
+
+  void priceChecker() {
+    priceCheckTimer = Timer.periodic(new Duration(seconds: 10), (timer) {
+      getBTCPrice();
     });
   }
 
@@ -561,6 +649,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     });
 
     timerCount();
+    priceChecker();
   }
 
   Future<http.Response> unsubscribeToBot() async {
@@ -603,14 +692,39 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     });
   }
 
-  Future<http.Response> getUpdatedBotDetails() async {
-    setState(() {
-      isUpdating = true;
-    });
+//  Future<http.Response> getUpdatedBotDetails() async {
+//    setState(() {
+//      isUpdating = true;
+//    });
+//
+//    print('Sending request to bot ${bot['botId']} for latest updates.');
+//
+//    final response = await http.get('http://localhost:3000/v1/trader-bot?botId=${bot['botId']}');
+//
+//    if (response.statusCode == 200) {
+//      final data = json.decode(response.body);
+//
+//      print('*********');
+//      print(data);
+//      print('*********');
+//
+//      setState(() {
+//        fullResponse = json.decode(response.body);
+//        bot = fullResponse['bot'];
+//      });
+//    } else {
+//      throw Exception('Failed to retrieve latest Bot updates');
+//    }
+//
+//    setState(() {
+//      isUpdating = false;
+//    });
+//  }
 
-    print('Sending request to bot ${bot['botId']} for latest updates.');
+  Future<http.Response> getBTCPrice() async {
+    print('Sending request to Binance to get BTC price.');
 
-    final response = await http.get('http://localhost:3000/v1/trader-bot?botId=${bot['botId']}');
+    final response = await http.get('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -620,16 +734,11 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
       print('*********');
 
       setState(() {
-        fullResponse = json.decode(response.body);
-        bot = fullResponse['bot'];
+        BTCPrice = double.parse(data['price']);
       });
     } else {
-      throw Exception('Failed to retrieve latest Bot updates');
+      throw Exception('Failed to retrieve BTC price from Binance');
     }
-
-    setState(() {
-      isUpdating = false;
-    });
   }
 
   void _receiveBotUpdate(String message) {
@@ -663,7 +772,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
         if (data['tradeData'] != null) {
           tradeData = data['tradeData'];
 
-          isProfiting = tradeData['priceDifference'] < 0;
+          isProfiting = double.parse(tradeData['priceDifference']) < 0;
         }
       } catch (e) {
         print('Websocket message is not in JSON format');

@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_flutter/amplify.dart';
+import 'package:crypto_tracker/auth/check-auth.dart';
 import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +24,7 @@ class CoinsScreen extends StatefulWidget {
 }
 
 class _CoinsScreenState extends State<CoinsScreen> {
+  bool isLoggedIn = false;
 
   bool isUpdating = false;
   WalletValuation walletValuation;
@@ -34,9 +39,32 @@ class _CoinsScreenState extends State<CoinsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    checkIfAuthenticated().then((success) {
+      setState(() {
+        isLoggedIn = success;
+      });
+    });
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+          title: Text(
+            widget.title,
+//            style: TextStyle(
+//                color: Colors.black
+//            ),
+          ),
+//        backgroundColor: Colors.transparent,
+//        elevation: 0.0
+        automaticallyImplyLeading: false,
+        actions: [
+          if (isLoggedIn) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => showConfirmLogoutDialog(context),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.COINS_SCREEN),
       body: Center(
