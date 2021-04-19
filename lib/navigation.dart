@@ -1,4 +1,5 @@
 import 'package:crypto_tracker/screens/general/bot-finished.dart';
+import 'package:crypto_tracker/screens/general/bot-logs.dart';
 import 'package:crypto_tracker/screens/general/coins.dart';
 import 'package:crypto_tracker/screens/auth/confirm-email.dart';
 import 'package:crypto_tracker/screens/general/home.dart';
@@ -23,7 +24,8 @@ class AppNavigation {
     NavigationRoutes.BEST_PERFORMERS: (BuildContext context) => BestPerformersScreen(title: ScreenTitles.BEST_PERFORMERS),
     NavigationRoutes.SUBSCRIBE: (BuildContext context) => SubscribeScreen(title: ScreenTitles.SUBSCRIBE),
     NavigationRoutes.BOT_FINISHED: (BuildContext context) => BotFinishedScreen(title: ScreenTitles.BOT_FINISHED),
-    NavigationRoutes.PRICE_CHARTS: (BuildContext context) => PriceChartsScreen(title: ScreenTitles.PRICE_CHARTS)
+    NavigationRoutes.PRICE_CHARTS: (BuildContext context) => PriceChartsScreen(title: ScreenTitles.PRICE_CHARTS),
+    NavigationRoutes.BOT_LOGS: (BuildContext context) => BotLogsScreen(title: ScreenTitles.BOT_LOGS)
   };
 
 }
