@@ -37,6 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text(
               widget.title,
           ),
+//          backgroundColor: Colors.transparent,
+//          elevation: 0.0,
           automaticallyImplyLeading: false,
           actions: [
             if (isLoggedIn) Padding(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 checkIfAuthenticated() async {
-    await Future.delayed(Duration(seconds: 1));
+  await Future.delayed(Duration(seconds: 1));
   final session = await Amplify.Auth.fetchAuthSession();
 //  await Future.delayed(Duration(seconds: 2));
 //  return true;
@@ -29,12 +29,8 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('debug 4');
 
     checkIfAuthenticated().then((success) {
-      print('debug 5');
-      print(success);
-
       if (success) {
         Navigator.pushReplacementNamed(context, '/price-charts');
       } else {

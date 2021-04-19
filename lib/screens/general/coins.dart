@@ -94,10 +94,23 @@ class _CoinsScreenState extends State<CoinsScreen> {
               ),
               if (!isUpdating) Container(
 //              child: Text('${widget.coins.length} Currencies'),
-                child: Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${walletValuation.values.length} Currencies'),
-                    Text('\$${walletValuation.totalValue}')
+                    Text('Total of '),
+                    Text(
+                        '${walletValuation.values.length}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    Text(' currencies worth '),
+                    Text(
+                        '\$${walletValuation.totalValue}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold
+                      ),
+                    )
                   ],
                 ),
                 padding: EdgeInsets.all(10),
@@ -188,36 +201,6 @@ class _CoinsScreenState extends State<CoinsScreen> {
                                 ],
                               ),
                             ),
-//                            Center(
-//                              child: Row(
-//                                crossAxisAlignment: CrossAxisAlignment.center,
-//                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                                children: <Widget>[
-//                                  Container(
-//                                    child: Text(
-//                                      coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
-//                                      style: TextStyle(
-//                                          fontWeight: FontWeight.bold,
-//                                          fontSize: 16
-//                                      ),
-//                                    ),
-//                                  ),
-////                                Text(
-////                                  coinsValuation['coinCount'].toStringAsFixed(6),
-////                                  style: TextStyle(
-////                                      fontSize: 16
-////                                  ),
-////                                ),
-//                                ],
-//                              ),
-//                            ),
-//                            Row(
-//                              children: [
-//                                symbolPairButton(coin, pairs)
-//                              ],
-//                              mainAxisAlignment: MainAxisAlignment.end,
-////                              crossAxisAlignment: CrossAxisAlignment.end,
-//                            )
                           ],
                         )
                     );
@@ -264,7 +247,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                                 color: Colors.white
                             ),
                           ),
-                          color: Color(0xff888888),
+                          color: Colors.blue,
                           padding: EdgeInsets.symmetric(vertical: 6),
                           alignment: Alignment.center,
                         ),
