@@ -2,7 +2,6 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:crypto_tracker/redux/coins/coins.state.dart';
 import 'package:crypto_tracker/store.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 
@@ -36,10 +35,13 @@ class _MyAppState extends State<CryptoTrackerApp> {
   }
 
   void _configureAmplify() async {
+    print('debug 1');
     if (!mounted) return;
+    print('debug 2');
 
     Amplify.addPlugin(AmplifyAuthCognito());
     Amplify.addPlugin(AmplifyAPI());
+    print('debug 3');
 
     try {
       await Amplify.configure(amplifyconfig);
