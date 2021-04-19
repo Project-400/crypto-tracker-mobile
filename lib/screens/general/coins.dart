@@ -130,10 +130,10 @@ class _CoinsScreenState extends State<CoinsScreen> {
                         decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
+                                color: Colors.white,
                                 spreadRadius: 0.2,
                                 blurRadius: 0.5,
-                                offset: Offset(0, 0.5), // changes position of shadow
+                                offset: Offset(0, 0.2), // changes position of shadow
                               ),
                             ],
                             borderRadius: BorderRadius.only(
@@ -145,6 +145,24 @@ class _CoinsScreenState extends State<CoinsScreen> {
                         ),
                         child: Column(
                           children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  coin,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18
+                                  ),
+                                ),
+                                Spacer(),
+                                symbolPairButton(coin, pairs)
+
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.center,
+//                              crossAxisAlignment: CrossAxisAlignment.end,
+                            ),
+                            Divider(),
                             Center(
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -152,27 +170,12 @@ class _CoinsScreenState extends State<CoinsScreen> {
                                 children: <Widget>[
                                   Container(
                                     child: Text(
-                                      coin,
+                                      coinsValuation['coinCount'].toStringAsFixed(8),
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold,
                                           fontSize: 16
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    coinsValuation['coinCount'].toStringAsFixed(8),
-                                    style: TextStyle(
-                                        fontSize: 16
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Center(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
                                   Container(
                                     child: Text(
                                       coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
@@ -181,22 +184,40 @@ class _CoinsScreenState extends State<CoinsScreen> {
                                           fontSize: 16
                                       ),
                                     ),
-                                  ),
-//                                Text(
-//                                  coinsValuation['coinCount'].toStringAsFixed(6),
-//                                  style: TextStyle(
-//                                      fontSize: 16
-//                                  ),
-//                                ),
+                                  )
                                 ],
                               ),
                             ),
-                            Column(
-                              children: [
-                                symbolPairButton(coin, pairs)
-                              ],
-                              mainAxisAlignment: MainAxisAlignment.end,
-                            )
+//                            Center(
+//                              child: Row(
+//                                crossAxisAlignment: CrossAxisAlignment.center,
+//                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                children: <Widget>[
+//                                  Container(
+//                                    child: Text(
+//                                      coinsValuation['usdValue'] != null ? '\$${double.parse(coinsValuation['usdValue']).toStringAsFixed(2)}' : '\$0.00',
+//                                      style: TextStyle(
+//                                          fontWeight: FontWeight.bold,
+//                                          fontSize: 16
+//                                      ),
+//                                    ),
+//                                  ),
+////                                Text(
+////                                  coinsValuation['coinCount'].toStringAsFixed(6),
+////                                  style: TextStyle(
+////                                      fontSize: 16
+////                                  ),
+////                                ),
+//                                ],
+//                              ),
+//                            ),
+//                            Row(
+//                              children: [
+//                                symbolPairButton(coin, pairs)
+//                              ],
+//                              mainAxisAlignment: MainAxisAlignment.end,
+////                              crossAxisAlignment: CrossAxisAlignment.end,
+//                            )
                           ],
                         )
                     );
@@ -215,7 +236,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
 
   Widget symbolPairButton(String coin, List<String> pairs) {
     return SizedBox.fromSize(
-      size: Size(40, 40), // button width and height
+      size: Size(30, 30), // button width and height
       child: ClipOval(
         child: Material(
           color: Colors.orange, // button color
@@ -257,7 +278,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                   PriceChartsScreen(title: 'Price Charts', symbol: selectedPair))
               );
             }, // button pressed
-            child: Icon(Icons.show_chart_sharp, size: 30), // icon
+            child: Icon(Icons.show_chart_sharp, size: 20), // icon
           ),
         ),
       ),
@@ -280,7 +301,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:15002/valuation/all');
+    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/valuation/all');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -308,11 +329,9 @@ class _CoinsScreenState extends State<CoinsScreen> {
   }
 
   Future<void> fetchSymbolPairs() async {
-    print('FETCH SYMBOL PAIRS');
-
     await getStoredSymbolPairs(); // Continue to request symbols in case a change has been made since last local storage save
 
-    final response = await http.get('http://localhost:15005/symbol-pairs');
+    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/symbol-pairs');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -333,14 +352,10 @@ class _CoinsScreenState extends State<CoinsScreen> {
   }
 
   Future<bool> getStoredSymbolPairs() async {
-    print('GET STORED SYMBOL PAIRS');
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String allPairs = prefs.getString('allSymbolPairs');
 
     if (allPairs != null) {
-      print('GOT STORED SYMBOL PAIRS');
-
       Map<String, dynamic> pairs = json.decode(allPairs);
 
       setState(() {
@@ -349,15 +364,11 @@ class _CoinsScreenState extends State<CoinsScreen> {
 
       return true;
     }
-    print('NO STORED SYMBOL PAIRS');
-
 
     return false;
   }
 
   void setStoredSymbolPairs(Map<String, dynamic> pairs) async {
-    print('SET STORED SYMBOL PAIRS');
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('allSymbolPairs', json.encode(pairs));
   }
