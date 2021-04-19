@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/price-change-stats.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -33,6 +35,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.BEST_PERFORMERS),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

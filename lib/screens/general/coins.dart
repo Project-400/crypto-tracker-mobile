@@ -286,7 +286,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:15001/valuation/all/${await userAuthSub()}');
+    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/valuation/all/${await userAuthSub()}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
