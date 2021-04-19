@@ -10,5 +10,6 @@ class NavigationRoutes {
   static const String SUBSCRIBE = '/subscribe';
   static const String BOT_FINISHED = '/bot-finished';
   static const String PRICE_CHARTS = '/price-charts';
+  static const String BOT_LOGS = '/bot-logs';
 
 }

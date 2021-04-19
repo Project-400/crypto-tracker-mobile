@@ -35,13 +35,10 @@ class _MyAppState extends State<CryptoTrackerApp> {
   }
 
   void _configureAmplify() async {
-    print('debug 1');
     if (!mounted) return;
-    print('debug 2');
 
     Amplify.addPlugin(AmplifyAuthCognito());
     Amplify.addPlugin(AmplifyAPI());
-    print('debug 3');
 
     try {
       await Amplify.configure(amplifyconfig);

@@ -131,7 +131,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:15004/trends/best-performers');
+    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/trends/best-performers');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -142,7 +142,7 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
         widget.stats.addAll(stats);
       });
     } else {
-      throw Exception('Failed to fetch Coins');
+      throw Exception('Failed to fetch Best Performers');
     }
 
     setState(() {

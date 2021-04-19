@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
+import 'package:crypto_tracker/auth/auth-sub.dart';
 import 'package:crypto_tracker/auth/check-auth.dart';
 import 'package:crypto_tracker/components/bottom-navigation.dart';
 import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
@@ -97,7 +99,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Total of '),
+                    Text('You have a total of '),
                     Text(
                         '${walletValuation.values.length}',
                       style: TextStyle(
@@ -284,26 +286,18 @@ class _CoinsScreenState extends State<CoinsScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('https://w0sizekdyd.execute-api.eu-west-1.amazonaws.com/dev/valuation/all');
+    final response = await http.get('http://localhost:15001/valuation/all/${await userAuthSub()}');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-      print(data);
-      print('----------');
-
       if (data['success']) {
         setState(() {
-//          walletValuation = WalletValuation(data['totalValue'], data['values'].map((Map<String, dynamic> v) =>
-//            CoinsValuation(v['coin'], v['coinCount'], v['isNonMainstream'], v['usdValue'], CoinIndividualValues.fromJson(v['individualValues']), CoinTotalValues.fromJson(v['totalValues'])))
-//          );
           walletValuation = WalletValuation.fromJson(data).sortByValue(true);
         });
       }
 
-//      WalletValuation walletValuation = (data['values'] as List).map((c) => Coin.fromJson(c));
       setState(() {
-//        widget.coins.addAll(coins);
         isUpdating = false;
       });
     } else {
@@ -319,14 +313,12 @@ class _CoinsScreenState extends State<CoinsScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-//      print('SYMBOL PAIRS');
       print(data);
       print('----------');
 
       if (data['success']) {
         setState(() {
           symbolPairs = data['pairs'];
-//          setStoredSymbolPairs(symbolPairs);
         });
       }
     } else {

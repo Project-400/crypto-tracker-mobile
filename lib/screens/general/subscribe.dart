@@ -228,7 +228,6 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
     );
   }
 
-
   Widget botButton(String text, Function onPressed) {
     return Container(
       child: RaisedButton(

@@ -24,14 +24,17 @@ class BottomNavBar extends StatelessWidget {
       case ScreenTitles.SUBSCRIBE:
         currentIndex = 2;
         break;
+      case ScreenTitles.BEST_PERFORMERS:
+        currentIndex = 3;
+        break;
+      case ScreenTitles.BOT_LOGS:
+        currentIndex = 4;
+        break;
     }
 
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
-//        BottomNavigationBarItem(
-//          icon: Icon(Icons.home),
-//          label: ScreenTitles.HOME_SCREEN,
-//        ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.attach_money),
           label: ScreenTitles.COINS_SCREEN,
@@ -43,6 +46,14 @@ class BottomNavBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.queue_outlined),
           label: ScreenTitles.SUBSCRIBE,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bar_chart),
+          label: ScreenTitles.BEST_PERFORMERS,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.format_list_bulleted),
+          label: ScreenTitles.BOT_LOGS,
         ),
       ],
       type: BottomNavigationBarType.fixed,
@@ -62,6 +73,12 @@ class BottomNavBar extends StatelessWidget {
             break;
           case 2:
             url = NavigationRoutes.SUBSCRIBE;
+            break;
+          case 3:
+            url = NavigationRoutes.BEST_PERFORMERS;
+            break;
+          case 4:
+            url = NavigationRoutes.BOT_LOGS;
             break;
         }
         Navigator.pushNamed(context, url);
