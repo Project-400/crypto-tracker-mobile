@@ -18,17 +18,17 @@ import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
-class SubscribeScreen extends StatefulWidget {
-  SubscribeScreen({Key key, this.title}) : super(key: key);
+class DeployBotScreen extends StatefulWidget {
+  DeployBotScreen({Key key, this.title}) : super(key: key);
 
   final String title;
   final WebSocketChannel channel = IOWebSocketChannel.connect('ws://localhost:8999');
 
   @override
-  _SubscribeScreenState createState() => _SubscribeScreenState();
+  _DeployBotScreenState createState() => _DeployBotScreenState();
 }
 
-class _SubscribeScreenState extends State<SubscribeScreen> {
+class _DeployBotScreenState extends State<DeployBotScreen> {
   bool isLoggedIn = false;
 
 //  Timer ticker;
@@ -87,7 +87,7 @@ class _SubscribeScreenState extends State<SubscribeScreen> {
               ),
             ],
           ),
-          bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.SUBSCRIBE),
+          bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.DEPLOY_BOT),
           body: Center(
               child: ListView(
                 children: <Widget>[

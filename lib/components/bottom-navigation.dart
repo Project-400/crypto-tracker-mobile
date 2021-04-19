@@ -21,7 +21,7 @@ class BottomNavBar extends StatelessWidget {
       case ScreenTitles.PRICE_CHARTS:
         currentIndex = 1;
         break;
-      case ScreenTitles.SUBSCRIBE:
+      case ScreenTitles.DEPLOY_BOT:
         currentIndex = 2;
         break;
       case ScreenTitles.BEST_PERFORMERS:
@@ -45,7 +45,7 @@ class BottomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.queue_outlined),
-          label: ScreenTitles.SUBSCRIBE,
+          label: ScreenTitles.DEPLOY_BOT,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.bar_chart),
@@ -72,7 +72,7 @@ class BottomNavBar extends StatelessWidget {
             url = NavigationRoutes.PRICE_CHARTS;
             break;
           case 2:
-            url = NavigationRoutes.SUBSCRIBE;
+            url = NavigationRoutes.DEPLOY_BOT;
             break;
           case 3:
             url = NavigationRoutes.BEST_PERFORMERS;
