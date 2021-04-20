@@ -39,41 +39,61 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Email Address',
-                    hintText: 'Email Address'
-                ),
-                onChanged: (email) => emailAddress = email,
-                controller: TextEditingController(
-                  text: widget.directedEmail
-                ),
-              ),
-              padding: EdgeInsets.all(10),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background2.jpeg'
             ),
-            Container(
-              child: TextField(
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Password'
+            fit: BoxFit.fitHeight,
+          ),
+        ),
+        child: Container(
+          color: Colors.white.withOpacity(0.9),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Email Address',
+                      hintText: 'Email Address'
+                  ),
+                  onChanged: (email) => emailAddress = email,
+                  controller: TextEditingController(
+                      text: widget.directedEmail
+                  ),
                 ),
-                onChanged: (pw) => password = pw,
+                padding: EdgeInsets.all(10),
               ),
-              padding: EdgeInsets.all(10),
-            ),
-            ElevatedButton(
-                child: Text('Login'),
-                onPressed: login
-            )
-          ],
+              Container(
+                child: TextField(
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Password'
+                  ),
+                  onChanged: (pw) => password = pw,
+                ),
+                padding: EdgeInsets.all(10),
+              ),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(top: 50, left: 10, right: 10),
+                child: ElevatedButton(
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                        fontSize: 16
+                    ),
+                  ),
+                  onPressed: login
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -23,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isSignedUp = false;
   String emailAddress;
   String password;
+  String repeatPassword;
 
   @override
   Widget build(BuildContext context) {
@@ -30,38 +31,71 @@ class _SignUpScreenState extends State<SignUpScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Email Address',
-                    hintText: 'Email Address'
-                ),
-                onChanged: (email) => emailAddress = email,
-              ),
-              padding: EdgeInsets.all(10),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background2.jpeg'
             ),
-            Container(
-              child: TextField(
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Password'
+            fit: BoxFit.fitHeight,
+          ),
+        ),
+        child: Container(
+          color: Colors.white.withOpacity(0.9),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                child: TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Email Address',
+                      hintText: 'Email Address'
+                  ),
+                  onChanged: (email) => emailAddress = email,
                 ),
-                onChanged: (pw) => password = pw,
+                padding: EdgeInsets.all(10),
               ),
-              padding: EdgeInsets.all(10),
-            ),
-            ElevatedButton(
-              child: Text('Sign Up'),
-              onPressed: signUp
-            )
-          ],
+              Container(
+                child: TextField(
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Password'
+                  ),
+                  onChanged: (pw) => password = pw,
+                ),
+                padding: EdgeInsets.all(10),
+              ),
+              Container(
+                child: TextField(
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      labelText: 'Repeat Password',
+                      hintText: 'Repeat Password'
+                  ),
+                  onChanged: (pw) => repeatPassword = pw,
+                ),
+                padding: EdgeInsets.all(10),
+              ),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(top: 50, left: 10, right: 10),
+                child: ElevatedButton(
+                  child: Text(
+                      'Sign Up',
+                    style: TextStyle(
+                      fontSize: 16
+                    ),
+                  ),
+                  onPressed: signUp
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
