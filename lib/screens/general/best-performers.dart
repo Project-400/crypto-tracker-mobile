@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:crypto_tracker/components/bottom-navigation.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:crypto_tracker/models/price-change-stats.dart';
+import 'package:crypto_tracker/screens/general/price-charts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
@@ -66,9 +67,9 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
                       decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.white,
                               spreadRadius: 0.2,
-                              blurRadius: 0.5,
+                              blurRadius: 0.2,
                               offset: Offset(0, 0.5), // changes position of shadow
                             ),
                           ],
@@ -77,7 +78,8 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
                               topRight: Radius.circular(4),
                               bottomLeft: Radius.circular(4),
                               bottomRight: Radius.circular(4)
-                          )
+                          ),
+                        border: Border.all(color: Colors.blueAccent, width: 0.2)
                       ),
                       child: Center(
                         child: Row(
@@ -102,6 +104,9 @@ class _BestPerformersScreenState extends State<BestPerformersScreen> {
                           ],
                         ),
                       ),
+                    ),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                        PriceChartsScreen(title: 'Price Charts', symbol: stats.symbol))
                     ),
                   );
                 },
