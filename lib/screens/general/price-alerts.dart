@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto_tracker/components/bottom-navigation.dart';
+import 'package:crypto_tracker/components/confirm-logout-dialog.dart';
 import 'package:crypto_tracker/constants/screen-titles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -32,16 +33,21 @@ class _PriceAlertsScreenState extends State<PriceAlertsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        automaticallyImplyLeading: true,
+        actions: [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () => showConfirmLogoutDialog(context),
+            ),
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomNavBar(selectedScreen: ScreenTitles.BOT_LOGS),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-//            Container(
-//              child: Text('Bot'),
-//              padding: EdgeInsets.all(10),
-//            ),
             if (isUpdating) Container(
               child: SpinKitWave(
                 color: Colors.blue,
@@ -58,60 +64,83 @@ class _PriceAlertsScreenState extends State<PriceAlertsScreen> {
                 itemBuilder: (BuildContext context, int index) {
                   final dynamic alert = widget.alerts[index];
 
-                  return Text(
-                      alert.toString()
-                  );
-//                  return InkWell(
-//                    child: Container(
-//                      padding: EdgeInsets.all(10),
-//                      decoration: BoxDecoration(
-//                          boxShadow: [
-//                            BoxShadow(
-//                              color: Colors.grey.withOpacity(0.3),
-//                              spreadRadius: 0.2,
-//                              blurRadius: 0.5,
-//                              offset: Offset(0, 0.5), // changes position of shadow
-//                            ),
-//                          ],
-//                          borderRadius: BorderRadius.only(
-//                              topLeft: Radius.circular(4),
-//                              topRight: Radius.circular(4),
-//                              bottomLeft: Radius.circular(4),
-//                              bottomRight: Radius.circular(4)
-//                          )
-//                      ),
-//                      child: Center(
-//                        child: Column(
-//                          children: [
+                  return InkWell(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 0.2,
+                              blurRadius: 0.5,
+                              offset: Offset(0, 0.5), // changes position of shadow
+                            ),
+                          ],
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(4)
+                          )
+                      ),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  child: Text(
+                                    alert['symbol'],
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  child: Text(
+                                    '\$${alert['price']}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  child: Text(
+                                    '+${alert['percentageDifference']}%',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16
+                                    ),
+                                  ),
+                                ),
 //                            Text(
-//                                tradeData.toString()
+//                              '${(stats.pricePercentageChanges['min5']).toStringAsFixed(2)}%',
+//                              style: TextStyle(
+//                                  fontSize: 16
+//                              ),
 //                            ),
-//                            Row(
-//                              crossAxisAlignment: CrossAxisAlignment.center,
-//                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                              children: <Widget>[
-//                                Container(
-//                                  child: Text(
-//                                    tradeData['symbol'],
-//                                    style: TextStyle(
-//                                        fontWeight: FontWeight.bold,
-//                                        fontSize: 16
-//                                    ),
-//                                  ),
-//                                ),
-////                            Text(
-////                              '${(stats.pricePercentageChanges['min5']).toStringAsFixed(2)}%',
-////                              style: TextStyle(
-////                                  fontSize: 16
-////                              ),
-////                            ),
-//                              ],
-//                            ),
-//                          ],
-//                        )
-//                      ),
-//                    ),
-//                  );
+                              ],
+                            ),
+                            Expanded(
+                              child: Container(
+                                child: Text(
+                                  '+${alert['time']}%',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ),
+                    ),
+                  );
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(
                   height: 6,
@@ -134,7 +163,7 @@ class _PriceAlertsScreenState extends State<PriceAlertsScreen> {
       isUpdating = true;
     });
 
-    final response = await http.get('http://localhost:3010/price-alerts');
+    final response = await http.get('http://localhost:3010/v1/price-alerts');
 
     print(response.statusCode);
     print(response.body);
@@ -142,9 +171,9 @@ class _PriceAlertsScreenState extends State<PriceAlertsScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
 
-//      setState(() {
-//        widget.botTradeData = data['data'];
-//      });
+      setState(() {
+        widget.alerts = data['priceAlerts'];
+      });
     } else {
       throw Exception('Failed to fetch Price Alerts');
     }

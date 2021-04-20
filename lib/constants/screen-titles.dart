@@ -11,5 +11,6 @@ class ScreenTitles {
   static const String BOT_FINISHED = 'Bot Finished';
   static const String PRICE_CHARTS = 'Price Charts';
   static const String BOT_LOGS = 'Bot Logs';
+  static const String PRICE_ALERTS = 'Price Alerts';
 
 }
