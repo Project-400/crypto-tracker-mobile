@@ -22,7 +22,7 @@ class DeployBotScreen extends StatefulWidget {
   DeployBotScreen({Key key, this.title}) : super(key: key);
 
   final String title;
-  final WebSocketChannel channel = IOWebSocketChannel.connect('ws://localhost:8999');
+//  final WebSocketChannel channel = IOWebSocketChannel.connect('ws://localhost:8999');
 
   @override
   _DeployBotScreenState createState() => _DeployBotScreenState();
@@ -42,6 +42,7 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
   double quoteAmount;
   double percentageLoss;
   bool repeatedlyTrade = false;
+  bool autoTrade = false;
   bool isProfiting = false;
   double priceDifferenceInUSD = 0;
   Map<String, dynamic> fullResponse;
@@ -59,9 +60,9 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
   void initState() {
     super.initState();
 
-    widget.channel.stream.listen((received) {
-      _receiveBotUpdate(received);
-    });
+//    widget.channel.stream.listen((received) {
+//      _receiveBotUpdate(received);
+//    });
   }
 
   @override
@@ -91,20 +92,46 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
           body: Center(
               child: ListView(
                 children: <Widget>[
+                  CheckboxListTile(
+                    title: Text('Auto Trading'),
+                    value: autoTrade,
+                    onChanged: (isTicked) {
+                      setState(() {
+                        autoTrade = isTicked;
+                      });
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                  if (autoTrade) Container(
+                    child: Text(
+                        'By ticking the "Auto Trading" checkbox, you are allowing our bot services to pick a performant currency to trade.'
+                    ),
+                    padding: EdgeInsets.all(10),
+                  ),
+                  if (!autoTrade) Container(
+                    child: Text(
+                        'Tick the "Auto Trading" checkbox above to allow our bot services to pick a performant currency to trade.'
+                    ),
+                    padding: EdgeInsets.all(10),
+                  ),
                   Visibility (
                     child: currencyPairSelector(context),
                     visible: !isBotWorking && !isUpdating,
                   ),
-                  if (!isBotWorking && !isUpdating) botButton(
-                      'Start Bot',
-                          () => selectedCurrencyPair == null || quoteAmount == null ? null : subscribeToBot()
+                  if (!isBotWorking && !isUpdating && !autoTrade) botButton(
+                      'Deploy Bot',
+                          () => selectedCurrencyPair == null || quoteAmount == null ? null : deployBot()
+                  ),
+                  if (!isBotWorking && !isUpdating && autoTrade) botButton(
+                      'Deploy Auto Bot',
+                          () => deployAutoBot()
                   ),
                   if (isBotWorking && !isUpdating) Row(
                     children: [
                       Expanded(
                         child: botButton(
                             'Shutdown Bot',
-                                () => unsubscribeToBot()
+                                () => shutdownBot()
                         ),
                       ),
                       Expanded(
@@ -250,21 +277,10 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
     return Column(
       children: [
         Container(
-          child: DropdownSearch<String>(
-            mode: Mode.BOTTOM_SHEET,
-            showSelectedItem: true,
-            items: ['ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
-            label: 'Currency Pair',
-            hint: 'The crypto currency you want to trade',
-            onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
-          ),
-          padding: EdgeInsets.all(10),
-        ),
-        Container(
           child: TextField(
             decoration: InputDecoration(
-            labelText: 'Quote Quantity',
-              hintText: '0.0001'
+            labelText: 'Quote Quantity (USD)',
+              hintText: '5'
             ),
             onChanged: (amount) => quoteAmount = double.parse(amount),
           ),
@@ -280,16 +296,27 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
           ),
           padding: EdgeInsets.all(10),
         ),
-        CheckboxListTile(
-          title: Text('Repeatedly Trade'),
-          value: repeatedlyTrade,
-          onChanged: (isTicked) {
-            setState(() {
-              repeatedlyTrade = isTicked;
-            });
-          },
-          controlAffinity: ListTileControlAffinity.leading,
-        )
+        if (!autoTrade) Container(
+          child: DropdownSearch<String>(
+            mode: Mode.BOTTOM_SHEET,
+            showSelectedItem: true,
+            items: ['ZRXBTC', 'COTIBTC', 'CELOBTC', 'GTOBTC', 'CRVBTC', 'LTOBTC', 'ALPHABTC', 'SUSHIBTC', 'MANABTC', 'XLMBTC', 'XRPBTC'],
+            label: 'Currency Pair',
+            hint: 'The crypto currency you want to trade',
+            onChanged: (currencyPair) => setSelectedCurrencyPair(currencyPair),
+          ),
+          padding: EdgeInsets.all(10),
+        ),
+//        CheckboxListTile(
+//          title: Text('Repeatedly Trade'),
+//          value: repeatedlyTrade,
+//          onChanged: (isTicked) {
+//            setState(() {
+//              repeatedlyTrade = isTicked;
+//            });
+//          },
+//          controlAffinity: ListTileControlAffinity.leading,
+//        )
       ],
     );
   }
@@ -585,16 +612,9 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
 //    if (ticker != null) ticker.cancel();
     if (timer != null) timer.cancel();
     if (priceCheckTimer != null) priceCheckTimer.cancel();
-    widget.channel.sink.close();
+//    widget.channel.sink.close();
     super.dispose();
   }
-
-//  void setIntervalRequest() {
-////    getUpdatedBotDetails();
-//    ticker = Timer.periodic(new Duration(seconds: 5), (timer) {
-//      getUpdatedBotDetails();
-//    });
-//  }
 
   void timerCount() {
     timer = Timer.periodic(new Duration(seconds: 1), (timer) {
@@ -610,7 +630,7 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
     });
   }
 
-  Future<http.Response> subscribeToBot() async {
+  Future<http.Response> deployBot() async {
     setState(() {
       isUpdating = true;
     });
@@ -620,7 +640,8 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
 
     print('Sending request to bot to trade $selectedCurrencyPair with $quoteAmount quote amount');
 
-    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId&percentageLoss=$percentageLoss');
+//    final response = await http.get('http://localhost:3000/v1/subscribe?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId&percentageLoss=$percentageLoss');
+    final response = await http.post('http://localhost:8080/v1/bot?currency=$selectedCurrencyPair&quoteAmount=$quoteAmount&repeatedlyTrade=$repeatedlyTrade&clientSocketId=$clientSocketId&percentageLoss=$percentageLoss');
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -642,7 +663,7 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
 //        quoteAmount = null;
       });
     } else {
-      throw Exception('Failed to subscribe to Bot');
+      throw Exception('Failed to deploy Bot');
     }
 
     setState(() {
@@ -653,7 +674,51 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
     priceChecker();
   }
 
-  Future<http.Response> unsubscribeToBot() async {
+  Future<http.Response> deployAutoBot() async {
+    setState(() {
+      isUpdating = true;
+    });
+
+    if (quoteAmount == null) throw Exception('Quote amount is missing selected');
+
+    print('Sending request for auto bot to trade');
+
+    final response = await http.post(
+        'http://localhost:8080/v1/auto-bot?quoteAmount=$quoteAmount&percentageLoss=$percentageLoss'
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      print('*********');
+      print(data);
+      print('*********');
+
+      setState(() {
+//        fullResponse = json.decode(response.body);
+//        bot = fullResponse['bot'];
+//        priceInfo = fullResponse['priceInfo'];
+//        currentPrice = priceInfo['price'];
+//        showBotDetails = true;
+//        isBotWorking = true;
+//        selectedCurrencyPair = null;
+//        repeatedlyTrade = true;
+//        botState = EnumToString.fromString(BotState.values, bot['botState']);
+//        quoteAmount = null;
+      });
+    } else {
+      throw Exception('Failed to deploy Auto Bot');
+    }
+
+    setState(() {
+      isUpdating = false;
+    });
+
+    timerCount();
+    priceChecker();
+  }
+
+  Future<http.Response> shutdownBot() async {
     setState(() {
       isUpdating = true;
     });
@@ -671,7 +736,7 @@ class _DeployBotScreenState extends State<DeployBotScreen> {
 
 //      if (ticker != null) ticker.cancel();
 
-      String botId = bot['botId'];
+//      String botId = bot['botId'];
 
       setState(() {
         fullResponse = null;
